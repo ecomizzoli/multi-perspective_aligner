@@ -12,7 +12,7 @@ public class DeclareModel {
     public DeclareModel(Map<String, ArrayList<String[]>> parsedLines) {
         this.activities = addActivities(parsedLines.get("activityLines"));
         Map<String, Attribute> attributes = bindAttributes(parsedLines.get("bindingLines"));
-        initializeAttributes(parsedLines.get("numericAttributeLines"), parsedLines.get("enumAttributeLines"), attributes);
+        initializeAttributes(parsedLines.get("intAttributeLines"), parsedLines.get("floatAttributeLines"), parsedLines.get("enumAttributeLines"), attributes);
         this.declareConstraints = addConstraints(parsedLines.get("binaryConstraintLines"), parsedLines.get("unaryConstraintLines"));
         createPartitions();
     }
@@ -57,20 +57,19 @@ public class DeclareModel {
 
 
     //Section: Initialization of each attribute and finally removing missing initializations
-    private void initializeAttributes(ArrayList<String[]> numbers, ArrayList<String[]> enums, Map<String, Attribute> attributes) {
-        initializeNumericAttributes(numbers, attributes);
+    private void initializeAttributes(ArrayList<String[]> integers, ArrayList<String[]> floats, ArrayList<String[]> enums, Map<String, Attribute> attributes) {
+        initializeNumericAttributes("integer", integers, attributes);
+        initializeNumericAttributes("float", floats, attributes);
         initializeEnumAttributes(enums, attributes);
         removeNotInitAttributes();
     }
 
-    private void initializeNumericAttributes(ArrayList<String[]> attributeLines, Map<String, Attribute> attributesMap) {
+    private void initializeNumericAttributes(String type, ArrayList<String[]> attributeLines, Map<String, Attribute> attributesMap) {
         for (String[] line : attributeLines) {
             for (String attributeName : extractList(line[0])) {
                 Attribute attribute = attributesMap.get(attributeName);
                 if (attribute != null && attribute.getType() == null) {
-                    attribute.setNumericAttribute(Double.parseDouble(line[1]), Double.parseDouble(line[2]));
-                } else {
-                    System.out.println("Attribute " + attributeName + " not found");
+                    attribute.setNumericAttribute(type, Double.parseDouble(line[1]), Double.parseDouble(line[2]));
                 }
             }
         }
@@ -98,15 +97,6 @@ public class DeclareModel {
             activity.getValue().getAttributes().removeIf(attribute -> attribute.getType() == null);
         }
     }
-
-
-
-
-
-
-
-
-
 
 
     //Section: Evaluation of each Constraint

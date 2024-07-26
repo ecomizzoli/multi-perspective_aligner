@@ -23,11 +23,12 @@ public class Runner {
     public static void findAlignments(int length) throws Exception {
         IOManager ioManager = IOManager.getInstance();
 
-        DeclareModel model = ioManager.readDeclareModel("recap.decl");
+        DeclareModel model = ioManager.readDeclareModel("recap-model.decl");
         //model.assignCosts(ioManager.readCostModel("testing-costModel.txt"));
-        LogFile log = ioManager.readLog("length_" + length + ".xes", model);
+        LogFile log = ioManager.readLog("recap-log.xes", model);
+        //System.out.println(log);
 
-        /*
+
         ioManager.exportModel(model);
         String ltlFormula = new DeclareToLTL(model).translateModelToLTL();
 
@@ -48,7 +49,7 @@ public class Runner {
             //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
             //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
             IOManager.getInstance().exportLog(log);
-        }*/
+        }
     }
 }
 

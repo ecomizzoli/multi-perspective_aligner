@@ -29,17 +29,6 @@ public class DeclareConstraint {
             assignToAttribute(target, targetConditionString, targetConditionsList, "target");
     }
 
-    private ArrayList<String> createConditionsStringsList(String conditionString, String flag) {
-        ArrayList<String> stringsList = new ArrayList<>();
-        if (conditionString != null) {
-            String[] conditionStrings = conditionString.replaceAll("[)(]", "").toLowerCase().split(" and | or ");
-            for (String subCondition : conditionStrings) {
-                addConditionToList(subCondition, stringsList, flag);
-            }
-        }
-        return stringsList;
-    }
-
     private void addConditionToList(String condition, ArrayList<String> list, String flag) {
         if (condition.contains("!=")) {
             String combinedCondition = addNotEqualCondition(condition, list);
@@ -79,6 +68,17 @@ public class DeclareConstraint {
         return true;
     }
 
+    private ArrayList<String> createConditionsStringsList(String conditionString, String flag) {
+        ArrayList<String> stringsList = new ArrayList<>();
+        if (conditionString != null) {
+            String[] conditionStrings = conditionString.replaceAll("[)(]", "").toLowerCase().split(" and | or ");
+            for (String subCondition : conditionStrings) {
+                addConditionToList(subCondition, stringsList, flag);
+            }
+        }
+        return stringsList;
+    }
+
     private boolean validateAttribute(Activity activity, String subConditionString, ArrayList<Condition> conditionList, String flag) {
         Attribute attribute = activity.getAttribute(subConditionString.split("[. ]")[1]);
         if (attribute != null && conditionMatchesType(attribute.getType(), subConditionString)) {
@@ -90,7 +90,7 @@ public class DeclareConstraint {
     }
 
     private boolean conditionMatchesType(String type, String conditionString) {
-        return (type.equals("numeric") && Arrays.stream(new String[]{"=","<",">"}).anyMatch(conditionString::contains)) ||
+        return ((type.equals("integer") || type.equals("float")) && Arrays.stream(new String[]{"=","<",">"}).anyMatch(conditionString::contains)) ||
                 (type.equals("enum") && Arrays.stream(new String[]{" is "," in "}).anyMatch(conditionString::contains));
     }
 

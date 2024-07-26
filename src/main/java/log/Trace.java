@@ -72,37 +72,34 @@ public class Trace {
                 originalTraceIndex++;
             } else if (nextLine.contains("add_")) {
                 String eventPartition = nextLine.split("add_")[1].split(" ")[2];
-                addEvent2(eventPartition, repairedTraceIndex, activityMap);
+                addEvent(eventPartition, repairedTraceIndex, activityMap);
                 repairedTraceIndex++;
             } else if (nextLine.contains("repl_")) {
                 String newPartition = nextLine.split("repl_")[1].split(" ")[3];
-                replaceEvent2(newPartition, originalTraceIndex, repairedTraceIndex, activityMap);
+                replaceEvent(newPartition, originalTraceIndex, repairedTraceIndex, activityMap);
                 originalTraceIndex++;
                 repairedTraceIndex++;
             }
-
         }
     }
 
-    private void addEvent2(String eventPartition, int index, Map<String, Activity> activities) {
+    private void addEvent(String eventPartition, int index, Map<String, Activity> activities) {
         Activity activity = activities.get(eventPartition.split("_")[0]);
-        ArrayList<String> activityPartition = activity.getPartitions().get(eventPartition);
-        XAttributeMap attributesOccurrenceBefore = eventOccurredBefore2(activity.getName(), index - 1);
+        XAttributeMap attributesOccurrenceBefore = eventOccurredBefore(activity.getName(), index - 1);
         if (attributesOccurrenceBefore != null) {
-            alignedEventsList.add(index, new Event(eventPartition, activityPartition, attributesOccurrenceBefore));
+            alignedEventsList.add(index, new Event(eventPartition, activity, attributesOccurrenceBefore));
         } else {
-            alignedEventsList.add(index, new Event(eventPartition, activityPartition));
+            alignedEventsList.add(index, new Event(eventPartition, activity));
         }
     }
 
-    private void replaceEvent2(String newPartition, int originalIndex, int repairedIndex, Map<String, Activity> activities) {
+    private void replaceEvent(String newPartition, int originalIndex, int repairedIndex, Map<String, Activity> activities) {
         Activity activity = activities.get(newPartition.split("_")[0]);
-        ArrayList<String> activityPartition = activity.getPartitions().get(newPartition);
         Event event = originalEventsList.get(originalIndex);
-        alignedEventsList.add(repairedIndex, new Event(event, newPartition, activityPartition));
+        alignedEventsList.add(repairedIndex, new Event(event, newPartition, activity));
     }
 
-    private XAttributeMap eventOccurredBefore2(String activityName, int pos) {
+    private XAttributeMap eventOccurredBefore(String activityName, int pos) {
         for (int i = pos; i >= 0; i--) {
             if (alignedEventsList.get(i).getState().split("_")[0].equals(activityName)) {
                 return alignedEventsList.get(i).getAttributes();

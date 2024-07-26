@@ -1,9 +1,0 @@
-activity a
-bind a: bool, integer
-activity b
-bind b: float, tt
-bool: true, false, undefined
-integer: integer between 0 and 100
-float: float between 0.1 and 9.9
-Init[a] |A.bool is true |
-Choice[a, b] |A.integer > 50 |T.float > 5 |

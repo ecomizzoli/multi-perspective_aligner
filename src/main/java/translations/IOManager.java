@@ -54,7 +54,7 @@ public class IOManager {
 
     private HashMap<String, ArrayList<String[]>> initializeSortingMap() {
         HashMap<String, ArrayList<String[]>> lines = new HashMap<>();
-        String[] lineDefinitions = {"activityLines", "bindingLines", "numericAttributeLines", "enumAttributeLines", "unaryConstraintLines", "binaryConstraintLines"};
+        String[] lineDefinitions = {"activityLines", "bindingLines", "intAttributeLines", "floatAttributeLines", "enumAttributeLines", "unaryConstraintLines", "binaryConstraintLines"};
         for (String container : lineDefinitions) {
             lines.put(container, new ArrayList<>());
         }
@@ -97,9 +97,9 @@ public class IOManager {
         } else if (enumMatcher.find()) {
             lines.get("enumAttributeLines").add(tokenizeEnumAttribute(enumMatcher));
         } else if (floatMatcher.find()) {
-            lines.get("numericAttributeLines").add(tokenizeNumericAttribute(floatMatcher));
+            lines.get("floatAttributeLines").add(tokenizeNumericAttribute(floatMatcher));
         } else if (intMatcher.find()) {
-            lines.get("numericAttributeLines").add(tokenizeNumericAttribute(intMatcher));
+            lines.get("intAttributeLines").add(tokenizeNumericAttribute(intMatcher));
         } else if (binaryMatcher.find()) {
             if (isConditionValid(binaryMatcher.group(4), patterns) && isConditionValid(binaryMatcher.group(5), patterns)) {
                 lines.get("binaryConstraintLines").add(tokenizeBinaryConstraint(binaryMatcher));

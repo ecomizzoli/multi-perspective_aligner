@@ -1,103 +1,46 @@
-This model contains 10 activities:
+This model contains 5 activities:
 
-activity1=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
+a=> My attributes are: 
+ax of type integer with bounds: [0.0, 100.0]
+The followings are my intervals: [(-Infinity, 0.0), [0.0, 30.0], (30.0, 40.0], (40.0, 50.0], (50.0, 100.0], (100.0, Infinity)]
 
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
+ay of type integer with bounds: [1.0, 1000.0]
+The followings are my intervals: [(-Infinity, 1.0), [1.0, 900.0), [900.0, 1000.0], (1000.0, Infinity)]
 
-The followings are my partitions: {activity1_p3=[categorical is c3, 0.0 <= integer < 10.0], activity1_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity1_p8=[categorical is c2, 10.0 < integer <= 100.0], activity1_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity1_p1=[categorical is c1, 0.0 <= integer < 10.0], activity1_p2=[categorical is c2, 0.0 <= integer < 10.0], activity1_p7=[categorical is c1, 10.0 < integer <= 100.0], activity1_p9=[categorical is c3, 10.0 < integer <= 100.0], activity1_p5=[categorical is c2, 10.0 <= integer <= 10.0]}
+The followings are my partitions: {a_p4=[50.0 < ax <= 100.0, 1.0 <= ay < 900.0], a_p6=[30.0 < ax <= 40.0, 900.0 <= ay <= 1000.0], a_p2=[30.0 < ax <= 40.0, 1.0 <= ay < 900.0], a_p1=[0.0 <= ax <= 30.0, 1.0 <= ay < 900.0], a_p8=[50.0 < ax <= 100.0, 900.0 <= ay <= 1000.0], a_p5=[0.0 <= ax <= 30.0, 900.0 <= ay <= 1000.0], a_p3=[40.0 < ax <= 50.0, 1.0 <= ay < 900.0], a_p7=[40.0 < ax <= 50.0, 900.0 <= ay <= 1000.0]}
 With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
 
-activity2=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
+b=> My attributes are: 
+bs of type float with bounds: [-1000.0, 1000.0]
+The followings are my intervals: [(-Infinity, -1000.0), [-1000.0, 1000.0], (1000.0, Infinity)]
 
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
+bt of type float with bounds: [0.0, 100.0]
+The followings are my intervals: [(-Infinity, 0.0), [0.0, 5.0], (5.0, 100.0], (100.0, Infinity)]
 
-The followings are my partitions: {activity2_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity2_p8=[categorical is c2, 10.0 < integer <= 100.0], activity2_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity2_p2=[categorical is c2, 0.0 <= integer < 10.0], activity2_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity2_p1=[categorical is c1, 0.0 <= integer < 10.0], activity2_p3=[categorical is c3, 0.0 <= integer < 10.0], activity2_p9=[categorical is c3, 10.0 < integer <= 100.0], activity2_p7=[categorical is c1, 10.0 < integer <= 100.0]}
+The followings are my partitions: {b_p2=[-1000.0 <= bs <= 1000.0, 5.0 < bt <= 100.0], b_p1=[-1000.0 <= bs <= 1000.0, 0.0 <= bt <= 5.0]}
 With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
 
-activity5=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
+c=> My attributes are: 
+name of type enum with values: [axel, susi, csaba]
 
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
+surname of type enum with values: [mezini, loddi, toth]
 
-The followings are my partitions: {activity5_p8=[categorical is c2, 10.0 < integer <= 100.0], activity5_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity5_p2=[categorical is c2, 0.0 <= integer < 10.0], activity5_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity5_p7=[categorical is c1, 10.0 < integer <= 100.0], activity5_p9=[categorical is c3, 10.0 < integer <= 100.0], activity5_p3=[categorical is c3, 0.0 <= integer < 10.0], activity5_p1=[categorical is c1, 0.0 <= integer < 10.0], activity5_p5=[categorical is c2, 10.0 <= integer <= 10.0]}
+The followings are my partitions: {c_p5=[name is susi, surname is loddi], c_p9=[name is csaba, surname is toth], c_p7=[name is axel, surname is toth], c_p2=[name is susi, surname is mezini], c_p4=[name is axel, surname is loddi], c_p8=[name is susi, surname is toth], c_p6=[name is csaba, surname is loddi], c_p3=[name is csaba, surname is mezini], c_p1=[name is axel, surname is mezini]}
 With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
 
-activity6=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
+d=> My attributes are: 
+boolean of type enum with values: [true, false, maybe]
 
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
+grade of type integer with bounds: [1.0, 10.0]
+The followings are my intervals: [(-Infinity, 1.0), [1.0, 10.0], (10.0, Infinity)]
 
-The followings are my partitions: {activity6_p7=[categorical is c1, 10.0 < integer <= 100.0], activity6_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity6_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity6_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity6_p1=[categorical is c1, 0.0 <= integer < 10.0], activity6_p8=[categorical is c2, 10.0 < integer <= 100.0], activity6_p9=[categorical is c3, 10.0 < integer <= 100.0], activity6_p3=[categorical is c3, 0.0 <= integer < 10.0], activity6_p2=[categorical is c2, 0.0 <= integer < 10.0]}
+The followings are my partitions: {d_p2=[boolean is false, 1.0 <= grade <= 10.0], d_p1=[boolean is true, 1.0 <= grade <= 10.0], d_p3=[boolean is maybe, 1.0 <= grade <= 10.0]}
 With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
 
-activity10=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity10_p2=[categorical is c2, 0.0 <= integer < 10.0], activity10_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity10_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity10_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity10_p3=[categorical is c3, 0.0 <= integer < 10.0], activity10_p1=[categorical is c1, 0.0 <= integer < 10.0], activity10_p7=[categorical is c1, 10.0 < integer <= 100.0], activity10_p8=[categorical is c2, 10.0 < integer <= 100.0], activity10_p9=[categorical is c3, 10.0 < integer <= 100.0]}
-With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
-
-activity3=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity3_p2=[categorical is c2, 0.0 <= integer < 10.0], activity3_p8=[categorical is c2, 10.0 < integer <= 100.0], activity3_p7=[categorical is c1, 10.0 < integer <= 100.0], activity3_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity3_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity3_p1=[categorical is c1, 0.0 <= integer < 10.0], activity3_p3=[categorical is c3, 0.0 <= integer < 10.0], activity3_p9=[categorical is c3, 10.0 < integer <= 100.0], activity3_p6=[categorical is c3, 10.0 <= integer <= 10.0]}
-With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
-
-activity4=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity4_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity4_p2=[categorical is c2, 0.0 <= integer < 10.0], activity4_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity4_p9=[categorical is c3, 10.0 < integer <= 100.0], activity4_p7=[categorical is c1, 10.0 < integer <= 100.0], activity4_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity4_p3=[categorical is c3, 0.0 <= integer < 10.0], activity4_p1=[categorical is c1, 0.0 <= integer < 10.0], activity4_p8=[categorical is c2, 10.0 < integer <= 100.0]}
-With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
-
-activity9=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity9_p9=[categorical is c3, 10.0 < integer <= 100.0], activity9_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity9_p1=[categorical is c1, 0.0 <= integer < 10.0], activity9_p7=[categorical is c1, 10.0 < integer <= 100.0], activity9_p2=[categorical is c2, 0.0 <= integer < 10.0], activity9_p8=[categorical is c2, 10.0 < integer <= 100.0], activity9_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity9_p3=[categorical is c3, 0.0 <= integer < 10.0], activity9_p4=[categorical is c1, 10.0 <= integer <= 10.0]}
-With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
-
-activity7=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity7_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity7_p1=[categorical is c1, 0.0 <= integer < 10.0], activity7_p2=[categorical is c2, 0.0 <= integer < 10.0], activity7_p8=[categorical is c2, 10.0 < integer <= 100.0], activity7_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity7_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity7_p3=[categorical is c3, 0.0 <= integer < 10.0], activity7_p7=[categorical is c1, 10.0 < integer <= 100.0], activity7_p9=[categorical is c3, 10.0 < integer <= 100.0]}
-With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
-
-activity8=> My attributes are: 
-categorical of type enum with values: [c1, c2, c3]
-
-integer of type numeric with bounds: [0.0, 100.0]
-The followings are my intervals: [(-Infinity, 0.0), [0.0, 10.0), [10.0, 10.0], (10.0, 100.0], (100.0, Infinity)]
-
-The followings are my partitions: {activity8_p9=[categorical is c3, 10.0 < integer <= 100.0], activity8_p5=[categorical is c2, 10.0 <= integer <= 10.0], activity8_p3=[categorical is c3, 0.0 <= integer < 10.0], activity8_p2=[categorical is c2, 0.0 <= integer < 10.0], activity8_p7=[categorical is c1, 10.0 < integer <= 100.0], activity8_p4=[categorical is c1, 10.0 <= integer <= 10.0], activity8_p8=[categorical is c2, 10.0 < integer <= 100.0], activity8_p6=[categorical is c3, 10.0 <= integer <= 10.0], activity8_p1=[categorical is c1, 0.0 <= integer < 10.0]}
+e=> My attributes are: 
+The followings are my partitions: {}
 With following costs: Add -> 1, Remove -> 1, Replace -> 1, Extra cost for wrong attributes -> 0, Extra cost for missing attributes -> 0
 
 This model contains following constraints:
-[template=Existence, activationActivity=activity5, activationCondition=A.categorical is c3 , targetActivity=null, targetCondition=null]
-[template=Existence, activationActivity=activity10, activationCondition=A.categorical is c3 , targetActivity=null, targetCondition=null]
-[template=Existence, activationActivity=activity7, activationCondition=A.integer > 10 , targetActivity=null, targetCondition=null]
-[template=Response, activationActivity=activity1, activationCondition=A.integer > 10 , targetActivity=activity2, targetCondition=T.integer < 10 ]
-[template=Response, activationActivity=activity3, activationCondition=A.categorical is c1 , targetActivity=activity4, targetCondition=T.categorical is c2 ]
-[template=Response, activationActivity=activity5, activationCondition=A.categorical is c3 , targetActivity=activity7, targetCondition=T.integer > 10 ]
-[template=Chain_Response, activationActivity=activity6, activationCondition=A.integer > 10 , targetActivity=activity7, targetCondition=T.integer > 10 ]
-[template=Chain_Response, activationActivity=activity1, activationCondition=A.categorical is c1 , targetActivity=activity4, targetCondition=T.categorical is c2 ]
-[template=Response, activationActivity=activity9, activationCondition=A.integer > 10 , targetActivity=activity10, targetCondition=T.integer > 10 ]
-[template=Exclusive_Choice, activationActivity=activity8, activationCondition=A.categorical is c1 , targetActivity=activity5, targetCondition=T.categorical is c3 ]
+[template=Init, activationActivity=a, activationCondition=A.ay >= 900 and A.ax > 30 and A.ax <= 40, targetActivity=null, targetCondition=null]
+[template=Choice, activationActivity=a, activationCondition=A.ax > 50 , targetActivity=b, targetCondition=T.bt > 5 ]

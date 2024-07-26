@@ -16,6 +16,13 @@
 	<trace>
 		<string key="concept:name" value="T01"/>
 		<event>
+            <string key="concept:name" value="a"/>
+          	<string key="lifecycle:transition" value="complete"/>
+       		<date key="time:timestamp" value="2015-04-29T14:01:28.942+03:00"/>
+          	<string key="ax" value="10"/>
+            <string key="ay" value="801"/>
+        </event>
+		<event>
        		<string key="concept:name" value="c"/>
        		<string key="lifecycle:transition" value="complete"/>
        		<date key="time:timestamp" value="2015-04-30T04:52:25.302+03:00"/>
@@ -69,7 +76,7 @@
     		<string key="concept:name" value="a"/>
     		<string key="lifecycle:transition" value="complete"/>
     		<date key="time:timestamp" value="2015-04-29T14:01:28.942+03:00"/>
-    		<string key="ax" value="10"/>
+    		<string key="ax" value="20"/>
     		<string key="ay" value="801"/>
     	</event>
     	<event>
@@ -84,7 +91,7 @@
     		<string key="lifecycle:transition" value="complete"/>
     		<date key="time:timestamp" value="2015-04-30T04:52:25.302+03:00"/>
     		<string key="name" value="csaba"/>
-            <string key="surname" value="totht"/>
+            <string key="surname" value="toth"/>
     	</event>
     	<event>
             <string key="concept:name" value="b"/>
@@ -115,13 +122,20 @@
     </trace>
    	<trace>
        	<string key="concept:name" value="T03"/>
+        <event>
+           	<string key="concept:name" value="a"/>
+           	<string key="lifecycle:transition" value="complete"/>
+       		<date key="time:timestamp" value="2015-04-29T14:01:28.942+03:00"/>
+       		<string key="ax" value="30"/>
+           	<string key="ay" value="801"/>
+       	</event>
        	<event>
-               		<string key="concept:name" value="c"/>
-               		<string key="lifecycle:transition" value="complete"/>
-               		<date key="time:timestamp" value="2015-04-30T04:52:25.302+03:00"/>
-             			<string key="name" value="axel"/>
-               		<string key="surname" value="mezini"/>
-            		</event>
+            <string key="concept:name" value="c"/>
+           	<string key="lifecycle:transition" value="complete"/>
+           	<date key="time:timestamp" value="2015-04-30T04:52:25.302+03:00"/>
+       		<string key="name" value="axel"/>
+          	<string key="surname" value="mezini"/>
+       	</event>
        	<event>
      		<string key="concept:name" value="b"/>
        		<string key="lifecycle:transition" value="complete"/>
@@ -129,7 +143,6 @@
        		<string key="bs" value="500.74999"/>
        		<string key="bt" value="1.40"/>
        	</event>
-
         <event>
         	<string key="concept:name" value="d"/>
         	<string key="lifecycle:transition" value="complete"/>
@@ -157,6 +170,13 @@
     </trace>
     <trace>
         <string key="concept:name" value="T04"/>
+        <event>
+            		<string key="concept:name" value="a"/>
+            		<string key="lifecycle:transition" value="complete"/>
+            		<date key="time:timestamp" value="2015-04-29T14:01:28.942+03:00"/>
+            		<string key="ax" value="40"/>
+            		<string key="ay" value="801"/>
+            	</event>
        	<event>
       		<string key="concept:name" value="e"/>
           	<string key="lifecycle:transition" value="complete"/>
@@ -200,6 +220,13 @@
     </trace>
     <trace>
       	<string key="concept:name" value="T05"/>
+      	<event>
+            		<string key="concept:name" value="a"/>
+            		<string key="lifecycle:transition" value="complete"/>
+            		<date key="time:timestamp" value="2015-04-29T14:01:28.942+03:00"/>
+            		<string key="ax" value="50"/>
+            		<string key="ay" value="801"/>
+            	</event>
         <event>
             <string key="concept:name" value="e"/>
             <string key="lifecycle:transition" value="complete"/>

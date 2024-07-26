@@ -30,8 +30,8 @@ public class Attribute {
         conditions.add(new Condition(type,name + " in " + String.join(", ", values)));
     }
 
-    public void setNumericAttribute(double min, double max) {
-        this.type = "numeric";
+    public void setNumericAttribute(String type, double min, double max) {
+        this.type = type;
         this.minValue = min;
         this.maxValue = max;
         conditions.add(new Condition(type,name + " >= " + minValue));

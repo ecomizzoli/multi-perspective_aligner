@@ -1,1 +1,97 @@
-This log contains 0 traces:
+This log contains 5 traces:
+	Trace T01 contains 8 events:
+		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=10} in state a_p1,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
+		a {ay=21, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=30} in state a_p1,
+		b {bs=70.49, bt=10.2, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		a {ay=5, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=49} in state a_p3,
+		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p2,
+		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p3,
+[a_p1, c_p1, a_p1, b_p2, e, a_p3, c_p2, d_p3]
+	Trace T01 after alignment contains 8 events:
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=31} in state a_p6,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
+		a {ay=21, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=30} in state a_p1,
+		b {bs=70.49, bt=10.2, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		a {ay=5, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=49} in state a_p3,
+		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p2,
+		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p3,
+[a_p6, c_p1, a_p1, b_p2, e, a_p3, c_p2, d_p3]
+
+	Trace T02 contains 7 events:
+		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=20} in state a_p1,
+		b {bs=101.444, bt=0, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state b_p1,
+		c {name=csaba, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p9,
+		b {bs=-101.444, bt=0.1, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state b_p1,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		d {boolean=true, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=8} in state d_p1,
+		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, grade=1} in state d_p3,
+[a_p1, b_p1, c_p9, b_p1, e, d_p1, d_p3]
+	Trace T02 after alignment contains 8 events:
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=31} in state a_p6,
+		b {bs=101.444, bt=0, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state b_p1,
+		c {name=csaba, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p9,
+		b {bs=-101.444, bt=0.1, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state b_p1,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		d {boolean=true, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=8} in state d_p1,
+		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, grade=1} in state d_p3,
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=51} in state a_p4,
+[a_p6, b_p1, c_p9, b_p1, e, d_p1, d_p3, a_p4]
+
+	Trace T03 contains 7 events:
+		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=30} in state a_p1,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
+		b {bs=500.74999, bt=1.40, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p1,
+		d {boolean=false, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state e,
+		a {ay=10, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=66} in state a_p4,
+[a_p1, c_p1, b_p1, d_p2, e, e, a_p4]
+	Trace T03 after alignment contains 7 events:
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=31} in state a_p6,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
+		b {bs=500.74999, bt=1.40, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p1,
+		d {boolean=false, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state e,
+		a {ay=10, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=66} in state a_p4,
+[a_p6, c_p1, b_p1, d_p2, e, e, a_p4]
+
+	Trace T04 contains 7 events:
+		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=40} in state a_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p7,
+		d {boolean=false, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p2,
+		e {ay=499, concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=3} in state e,
+		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00, surname=mezini} in state c_p2,
+		a {ay=10, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=66} in state a_p4,
+[a_p2, e, c_p7, d_p2, e, c_p2, a_p4]
+	Trace T04 after alignment contains 7 events:
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=39} in state a_p6,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p7,
+		d {boolean=false, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p2,
+		e {ay=499, concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=3} in state e,
+		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00, surname=mezini} in state c_p2,
+		a {ay=10, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=66} in state a_p4,
+[a_p6, e, c_p7, d_p2, e, c_p2, a_p4]
+
+	Trace T05 contains 6 events:
+		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=50} in state a_p3,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		d {boolean=true, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p1,
+		b {bs=50, bt=10, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state e,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p7,
+[a_p3, e, d_p1, b_p2, e, c_p7]
+	Trace T05 after alignment contains 6 events:
+		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=39} in state a_p6,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
+		d {boolean=true, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p1,
+		b {bs=50, bt=10, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
+		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:19:38.007+02:00} in state e,
+		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=toth} in state c_p7,
+[a_p6, e, d_p1, b_p2, e, c_p7]
+

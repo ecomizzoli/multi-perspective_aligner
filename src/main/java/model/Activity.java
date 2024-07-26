@@ -133,7 +133,7 @@ public class Activity {
         for (String subPartition : partition) {
             String attributeName = condition.getString().split(" ")[0];
             if (subPartition.contains(attributeName)) {
-                if (condition.getType().equals("numeric")) {
+                if (condition.getType().equals("integer") || condition.getType().equals("float")) {
                     String[] subPartitionTokens = subPartition.split(" ");
                     return String.valueOf(condition.isNumericContained(subPartitionTokens));
                 } else {
