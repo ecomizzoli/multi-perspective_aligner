@@ -58,7 +58,7 @@ public class Trace {
     }
 
 
-    public void repairTrace2(String alignment, Map<String, Activity> activityMap) {
+    public void repairTrace(String alignment, Map<String, Activity> activityMap) {
         alignedEventsList = new ArrayList<>();
         System.out.println(alignment + "\n");
         String[] lines = alignment.split("\\R");

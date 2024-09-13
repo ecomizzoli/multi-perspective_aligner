@@ -37,7 +37,7 @@ public class LogFile {
 
     public void repairTraces(ArrayList<String> alignments, Map<String, Activity> activityMap) {
         for (int i = 0; i < traces.size(); i++) {
-            traces.get(i).repairTrace2(alignments.get(i), activityMap);
+            traces.get(i).repairTrace(alignments.get(i), activityMap);
         }
     }
 

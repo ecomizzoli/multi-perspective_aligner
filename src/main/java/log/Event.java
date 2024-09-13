@@ -57,13 +57,11 @@ public class Event {
             return activity.getName();
         } else {
             for (Map.Entry<String, ArrayList<String>> partition : activity.getPartitions().entrySet()) {
-                System.out.println(activity.getName() + " " + partition);
                 ArrayList<Boolean> validValues = new ArrayList<>();
                 for (Attribute attribute : activityAttributes) {
                     if (!xEvent.getAttributes().containsKey(attribute.getName())) {
                         return activity.getName() + "_missing";
                     }
-                    System.out.println(xEvent.getAttributes().get(attribute.getName()).toString());
                     validValues.add(getPartitionValidity(xEvent.getAttributes().get(attribute.getName()), partition.getValue(), attribute.getType()));
                 }
                 if (!validValues.isEmpty() && !validValues.contains(false)) {
@@ -104,15 +102,17 @@ public class Event {
     }
 
     private void initializeNewEvent(ArrayList<String> partition, XFactoryNaiveImpl factory, Activity activity) {
-        for (String string : partition) {
-            if (string.contains(" is ")) {
-                String[] tokens = string.split(" is ");
-                xEvent.getAttributes().put(tokens[0], factory.createAttributeLiteral(tokens[0], tokens[1], null));
-            } else {
-                String[] tokens = string.split(" ");
-                String attributeType = activity.getAttribute(tokens[2]).getType();
-                XAttribute newAttribute = getRandomAttrValue(tokens, attributeType, factory);
-                xEvent.getAttributes().put(tokens[2], newAttribute);
+        if (partition != null) {
+            for (String string : partition) {
+                if (string.contains(" is ")) {
+                    String[] tokens = string.split(" is ");
+                    xEvent.getAttributes().put(tokens[0], factory.createAttributeLiteral(tokens[0], tokens[1], null));
+                } else {
+                    String[] tokens = string.split(" ");
+                    String attributeType = activity.getAttribute(tokens[2]).getType();
+                    XAttribute newAttribute = getRandomAttrValue(tokens, attributeType, factory);
+                    xEvent.getAttributes().put(tokens[2], newAttribute);
+                }
             }
         }
     }

@@ -143,7 +143,6 @@ public class Attribute {
 
     private ArrayList<String> decomposeNumericAttribute() {
         disjointConditions = new ArrayList<>();
-        System.out.println(conditions);
         for (Condition condition : conditions) {
           //  System.out.println(disjointConditions + " adding " + condition);
             addToDisjoint(condition);

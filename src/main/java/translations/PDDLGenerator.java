@@ -94,10 +94,8 @@ public class PDDLGenerator {
         return "\t(:action add_" + activityName + "_activity\n" +
                 "\t\t:parameters (?s1 - automaton_state ?e - " + activityName + "_activity ?s2 - automaton_state)\n" +
                 "\t\t:precondition (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
-                "\t\t:effect (and (increase (total-cost) " + activity.getAddCost() + ")\n" +
-                "\t\t\t(forall (?s1 ?s2 - automaton_state)\n" +
-                "\t\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
-                "\t\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2))\n\t))))\n\n";
+                "\t\t:effect (and (increase (total-cost) " + activity.getAddCost() + ") " +
+                "(not (cur_state ?s1)) (cur_state ?s2)\n\t))\n\n";
     }
 
     private String defineDeletion(Activity activity) {
@@ -105,7 +103,7 @@ public class PDDLGenerator {
         return "\t(:action del_" + activityName + "_activity\n" +
                 "\t\t:parameters (?t1 - trace_state ?e - " + activityName + "_activity ?t2 - trace_state)\n" +
                 "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2))\n" +
-                "\t\t:effect(and (increase (total-cost) " + activity.getRemoveCost() + ") " +
+                "\t\t:effect (and (increase (total-cost) " + activity.getRemoveCost() + ") " +
                 "(not (cur_state ?t1)) (cur_state ?t2))\n\t)\n\n";
     }
 
@@ -127,11 +125,11 @@ public class PDDLGenerator {
         String activityName = activity.getName();
         return "\t(:action repl_" + activityName + "_activity\n" +
                 "\t\t:parameters (?t1 - trace_state ?e1 - " + activityName + "_activity ?e2 - " +
-                activityName + "_activity ?t2 - trace_state)\n" +
-                "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e1 ?t2) (atoms ?e1 ?e2))\n" +
+                activityName + "_activity ?t2 - trace_state ?s1 - automaton_state ?s2 - automaton_state)\n" +
+                "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e1 ?t2) (atoms ?e1 ?e2) " +
+                "(cur_state ?s1) (automaton ?s1 ?e2 ?s2))\n" +
                 "\t\t:effect (and (increase (total-cost) " + activity.getReplaceCost() + ") " +
-                "(not (cur_state ?t1)) (cur_state ?t2)\n" +
-                automatonIterationString();
+                "(not (cur_state ?t1)) (cur_state ?t2) (not (cur_state ?s1)) (cur_state ?s2)\n\t))\n\n";
     }
 
     private String defineMissingReplacement(Activity activity) {

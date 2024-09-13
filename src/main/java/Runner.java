@@ -24,7 +24,7 @@ public class Runner {
         IOManager ioManager = IOManager.getInstance();
 
         DeclareModel model = ioManager.readDeclareModel("recap-model.decl");
-        //model.assignCosts(ioManager.readCostModel("testing-costModel.txt"));
+        model.assignCosts(ioManager.readCostModel("testing-costModel.txt"));
         LogFile log = ioManager.readLog("recap-log.xes", model);
         //System.out.println(log);
 
