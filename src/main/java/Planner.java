@@ -19,47 +19,47 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Planner extends AbstractStateSpacePlanner {
-
-    private final String domain;
-    private final ArrayList<String> problems;
-
-    public Planner(String domain, ArrayList<String> problems) {
-        super();
-        this.domain = domain;
-        this.problems = problems;
+  
+  private final String domain;
+  private final ArrayList<String> problems;
+  
+  public Planner(String domain, ArrayList<String> problems) {
+    super();
+    this.domain = domain;
+    this.problems = problems;
+  }
+  
+  public ArrayList<String> readProblems() {
+    ArrayList<String> alignments = new ArrayList<>();
+    for (String problem : problems) {
+      CodedProblem encodedProblem = readProblem(problem);
+      if (encodedProblem != null && encodedProblem.isSolvable()) {
+        Plan plan = search(encodedProblem);
+        alignments.add(encodedProblem.toString(plan));
+      } else{
+        System.out.println("Problem not solvable");
+      }
     }
-
-    public ArrayList<String> readProblems() {
-        ArrayList<String> alignments = new ArrayList<>();
-        for (String problem : problems) {
-            CodedProblem encodedProblem = readProblem(problem);
-            if (encodedProblem != null && encodedProblem.isSolvable()) {
-                Plan plan = search(encodedProblem);
-                alignments.add(encodedProblem.toString(plan));
-            } else{
-                System.out.println("Problem not solvable");
-            }
-        }
-        return alignments;
+    return alignments;
+  }
+  
+  
+  public CodedProblem readProblem(String problem)  {
+    ProblemFactory factory = ProblemFactory.getInstance();
+    ErrorManager errorManager = new ErrorManager();
+    try {
+      errorManager = factory.parseFromString(domain, problem);
+      System.out.println("Parsing domain and problem completed");
+      return factory.encode();
+    } catch (IOException e) {
+      errorManager.printAll();
+      return null;
     }
-
-
-    public CodedProblem readProblem(String problem)  {
-        ProblemFactory factory = ProblemFactory.getInstance();
-        ErrorManager errorManager = new ErrorManager();
-        try {
-            errorManager = factory.parseFromString(domain, problem);
-            System.out.println("Parsing domain and problem completed");
-            return factory.encode();
-        } catch (IOException e) {
-            errorManager.printAll();
-            return null;
-        }
-    }
-
-    @Override
-    public Plan search(CodedProblem encodedProblem) {
-        StateSpaceStrategy ehc = new AStar(Integer.MAX_VALUE, Heuristic.Type.MAX, 0);
-        return ehc.searchPlan(encodedProblem);
-    }
+  }
+  
+  @Override
+  public Plan search(CodedProblem encodedProblem) {
+    StateSpaceStrategy ehc = new AStar(Integer.MAX_VALUE, Heuristic.Type.MAX, 0);
+    return ehc.searchPlan(encodedProblem);
+  }
 }
