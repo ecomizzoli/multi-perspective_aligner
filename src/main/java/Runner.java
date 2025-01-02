@@ -26,27 +26,27 @@ public class Runner {
     ioManager.exportModel(model);
     String ltlFormula = new DeclareToLTL(model).translateModelToLTL();
     
-    if (!ltlFormula.isBlank()) {
-      // If formula exists, define and write PDDL problems.
-      System.out.println(ltlFormula);
-      PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
-      String domain = pddlGenerator.defineDomain();
-      ArrayList<String> problems = log.defineProblems(pddlGenerator);
-      int i = 1;
-      for (String problem : problems) {
-        IOManager.getInstance().exportProblemPDDL(problem, i);
-        i++;
-      }
-      IOManager.getInstance().exportDomainPDDL(domain);
+    if (ltlFormula.isBlank()) return;
 
-      // For each problem, find sequence of actions to solve the trace.
-      Planner planner = new Planner(domain, problems);
-      ArrayList<String> alignments = planner.readProblems();
-      log.repairTraces(alignments, model.getActivities());
-      //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
-      //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
-      IOManager.getInstance().exportLog(log);
+    // If formula exists, define and write PDDL problems.
+    System.out.println(ltlFormula);
+    PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
+    String domain = pddlGenerator.defineDomain();
+    ArrayList<String> problems = log.defineProblems(pddlGenerator);
+    int i = 1;
+    for (String problem : problems) {
+      IOManager.getInstance().exportProblemPDDL(problem, i);
+      i++;
     }
+    IOManager.getInstance().exportDomainPDDL(domain);
+
+    // For each problem, find sequence of actions to solve the trace.
+    Planner planner = new Planner(domain, problems);
+    ArrayList<String> alignments = planner.readProblems();
+    log.repairTraces(alignments, model.getActivities());
+    //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
+    //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
+    IOManager.getInstance().exportLog(log);
   }
 }
 

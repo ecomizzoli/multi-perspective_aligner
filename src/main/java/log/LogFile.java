@@ -10,59 +10,59 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class LogFile {
-
-    private final ArrayList<Trace> traces;
-
-    public LogFile(XLog xLog, DeclareModel declareModel) {
-        this.traces = findTraces(xLog, declareModel.getActivities());
+  
+  private final ArrayList<Trace> traces;
+  
+  public LogFile(XLog xLog, DeclareModel declareModel) {
+    this.traces = findTraces(xLog, declareModel.getActivities());
+  }
+  
+  public ArrayList<Trace> findTraces(XLog xlog, Map<String, Activity> activityMap) {
+    ArrayList<Trace> newTraces = new ArrayList<>();
+    if (xlog != null) {
+      for (XTrace trace : xlog) {
+        newTraces.add(new Trace(trace, activityMap));
+      }
     }
-
-    public ArrayList<Trace> findTraces(XLog xlog, Map<String, Activity> activityMap) {
-        ArrayList<Trace> newTraces = new ArrayList<>();
-        if (xlog != null) {
-            for (XTrace trace : xlog) {
-                newTraces.add(new Trace(trace, activityMap));
-            }
-        }
-        return newTraces;
+    return newTraces;
+  }
+  
+  public ArrayList<String> defineProblems(PDDLGenerator pddlGenerator) {
+    ArrayList<String> problems = new ArrayList<>();
+    for (Trace trace : traces) {
+      problems.add(pddlGenerator.generateProblem(trace.getSequence("original")));
     }
-
-    public ArrayList<String> defineProblems(PDDLGenerator pddlGenerator) {
-        ArrayList<String> problems = new ArrayList<>();
-        for (Trace trace : traces) {
-            problems.add(pddlGenerator.generateProblem(trace.getSequence("original")));
-        }
-        return problems;
+    return problems;
+  }
+  
+  public void repairTraces(ArrayList<String> alignments, Map<String, Activity> activityMap) {
+    for (int i = 0; i < traces.size(); i++) {
+      traces.get(i).repairTrace(alignments.get(i), activityMap);
     }
-
-    public void repairTraces(ArrayList<String> alignments, Map<String, Activity> activityMap) {
-        for (int i = 0; i < traces.size(); i++) {
-            traces.get(i).repairTrace(alignments.get(i), activityMap);
-        }
+  }
+  
+  public ArrayList<XTrace> buildOriginalXTraces() {
+    ArrayList<XTrace> originalXTraces = new ArrayList<>();
+    for (Trace trace : traces) {
+      trace.buildOriginalXTrace();
     }
-
-    public ArrayList<XTrace> buildOriginalXTraces() {
-        ArrayList<XTrace> originalXTraces = new ArrayList<>();
-        for (Trace trace : traces) {
-            trace.buildOriginalXTrace();
-        }
-        return originalXTraces;
+    return originalXTraces;
+  }
+  
+  public ArrayList<XTrace> buildRepairedXTraces() {
+    ArrayList<XTrace> originalXTraces = new ArrayList<>();
+    for (Trace trace : traces) {
+      trace.buildRepairedXTrace();
     }
-
-    public ArrayList<XTrace> buildRepairedXTraces() {
-        ArrayList<XTrace> originalXTraces = new ArrayList<>();
-        for (Trace trace : traces) {
-            trace.buildRepairedXTrace();
-        }
-        return originalXTraces;
+    return originalXTraces;
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder("This log contains " + traces.size() + " traces:\n");
+    for (Trace trace : traces) {
+      builder.append(trace.toString()).append("\n");
     }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder("This log contains " + traces.size() + " traces:\n");
-        for (Trace trace : traces) {
-            builder.append(trace.toString()).append("\n");
-        }
-        return builder.toString();
-    }
+    return builder.toString();
+  }
 }
