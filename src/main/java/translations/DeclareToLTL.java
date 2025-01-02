@@ -3,20 +3,18 @@ package translations;
 import model.DeclareConstraint;
 import model.DeclareModel;
 import model.DeclareTemplate;
-import org.processmining.ltl2automaton.plugins.formula.DefaultParser;
-import org.processmining.ltl2automaton.plugins.formula.Formula;
 
 public class DeclareToLTL {
   
   private final DeclareModel model;
-  private static final String OR_OPERATOR = "\\/", AND_OPERATOR = "/\\";
+  private static final String OR = "\\/", AND = "/\\";
   
   public DeclareToLTL(DeclareModel declareModel) {
     this.model = declareModel;
   }
   
-  //TODO: provare con ltl vuota
-  //Section: Translation of declare model constraints into LTL formula
+  // TODO: provare con ltl vuota
+  // Section: Translation of declare model constraints into LTL formula
   public String translateModelToLTL() {
     StringBuilder formulaBuilder = new StringBuilder();
     for (DeclareConstraint constraint : model.getDeclareConstraints()) {
@@ -25,10 +23,10 @@ public class DeclareToLTL {
       String targetString = constraint.defineTargetPartitioning(model.getActivities());
       if (isConstraintAcceptable(template.getFlag(), activationString, targetString)) {
         String newFormula = addToFormula(template, activationString, targetString);
-        formulaBuilder.append(newFormula).append(" " + AND_OPERATOR + " ");
+        formulaBuilder.append(newFormula).append(" " + AND + " ");
       }
     }
-    return formulaBuilder.isEmpty()? formulaBuilder.toString() : formulaBuilder.substring(0, formulaBuilder.length() - 4);
+    return formulaBuilder.isEmpty() ? formulaBuilder.toString() : formulaBuilder.substring(0, formulaBuilder.length() - 4);
   }
   
   private boolean isConstraintAcceptable(String flag, String aPartition, String tPartition) {
@@ -47,7 +45,7 @@ public class DeclareToLTL {
   }
   
   private String formatFormula(String formula) {
-    return addParenthesis(formula).replace(" or ", " " + OR_OPERATOR + " ");
+    return addParenthesis(formula).replace(" or ", " " + OR + " ");
   }
   
   private String addParenthesis(String string) {
@@ -55,7 +53,7 @@ public class DeclareToLTL {
   }
   
   
-  //Section: Translation of Constraint
+  // Section: Translation of Constraint
   private String translateUnaryConstraint(String aPartition, String name) {
     String aString = addParenthesis(aPartition);
     

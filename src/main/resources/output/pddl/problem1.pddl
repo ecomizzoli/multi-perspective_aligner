@@ -1,7 +1,7 @@
 (define (problem Align)
 (:domain Mining)
 (:objects
-t0 t1 t2 t3 t4 t5 t6 t7 t8 - trace_state
+t0 t1 t2 t3 t4 t5 t6 - trace_state
 S1 S2 S3 S0 s_abstract - automaton_state
 a_p4 a_p6 a_p2 a_p1 a_p8 a_p5 a_p3 a_p7 a_missing a_wrong - a_activity
 b_p2 b_p1 b_missing b_wrong - b_activity
@@ -11,15 +11,13 @@ e - e_activity
 )
 (:init
 (cur_state S1) (cur_state t0)
-(final_state S0) (final_state t8)
+(final_state S0) (final_state t6)
 (trace t0 a_p1 t1)
 (trace t1 c_p1 t2)
 (trace t2 a_p1 t3)
 (trace t3 b_p2 t4)
-(trace t4 e t5)
-(trace t5 a_p3 t6)
-(trace t6 c_p2 t7)
-(trace t7 d_p3 t8)
+(trace t4 c_p2 t5)
+(trace t5 d_p3 t6)
 (automaton S1 a_p6 S2)
 (automaton S1 a_p4 S3)
 (automaton S1 a_p2 S3)
@@ -84,7 +82,7 @@ e - e_activity
 (= (total-cost) 0)
 )
 (:goal
-(and (cur_state t8) (cur_state s_abstract)
+(and (cur_state t6) (cur_state s_abstract)
 ))
 (:metric minimize (total-cost))
 )

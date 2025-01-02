@@ -1,24 +1,20 @@
 This log contains 5 traces:
-	Trace T01 contains 8 events:
+	Trace T01 contains 6 events:
 		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=10} in state a_p1,
 		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
 		a {ay=21, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=30} in state a_p1,
 		b {bs=70.49, bt=10.2, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
-		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
-		a {ay=5, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=49} in state a_p3,
 		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p2,
 		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p3,
-[a_p1, c_p1, a_p1, b_p2, e, a_p3, c_p2, d_p3]
-	Trace T01 after alignment contains 8 events:
+[a_p1, c_p1, a_p1, b_p2, c_p2, d_p3]
+	Trace T01 after alignment contains 6 events:
 		a {ay=900, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=31} in state a_p6,
 		c {name=axel, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p1,
 		a {ay=21, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=30} in state a_p1,
 		b {bs=70.49, bt=10.2, concept:name=b, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state b_p2,
-		e {concept:name=e, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00} in state e,
-		a {ay=5, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=49} in state a_p3,
 		c {name=susi, concept:name=c, lifecycle:transition=complete, time:timestamp=2015-04-30T03:52:25.302+02:00, surname=mezini} in state c_p2,
 		d {boolean=maybe, concept:name=d, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, grade=10} in state d_p3,
-[a_p6, c_p1, a_p1, b_p2, e, a_p3, c_p2, d_p3]
+[a_p6, c_p1, a_p1, b_p2, c_p2, d_p3]
 
 	Trace T02 contains 7 events:
 		a {ay=801, concept:name=a, lifecycle:transition=complete, time:timestamp=2015-04-29T13:01:28.942+02:00, ax=20} in state a_p1,

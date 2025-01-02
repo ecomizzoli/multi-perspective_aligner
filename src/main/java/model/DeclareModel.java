@@ -1,7 +1,5 @@
 package model;
 
-import org.apache.commons.collections15.map.CaseInsensitiveMap;
-
 import java.util.*;
 
 public class DeclareModel {
