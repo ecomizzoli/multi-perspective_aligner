@@ -13,7 +13,398 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PDDLGenerator {
+
+  private static final double CHANGE_VALUE_COST = 0.5;
+  private static final double ADD_VALUE_COST = 1;
+  private static final double SET_VALUE_COST = 0.5;
+  private static final double DELETE_VALUE_COST = 1;
+  private static final String DOMAIN_STRING = "(define (domain trace-alignment)\n" + //
+        "\n" + //
+        "  (:requirements :strips :typing :equality :adl :fluents :action-costs)\n" + //
+        "\n" + //
+        "  (:types activity automaton_state trace_state parameter_name value_name)\n" + //
+        "\n" + //
+        "  ; ; Constants for prob\n" + //
+        "  ; (:constants\n" + //
+        "  ;   t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 - trace_state\n" + //
+        "  ;   s10 s11 s20 s21 s30 s31 s40 s41 s50 s51 s60 s61 s62 s70 s71 s72 s73 s80 s81 s82 - automaton_state\n" + //
+        "  ;   A B C D E F G - activity\n" + //
+        "  ;   x y z - parameter_name\n" + //
+        "  ;   a_x20 a_x40 a_y4 a_y6 a_z0 a_z1 c40 c30 c20 d10 d20 d40 e_x20 e_z0 e_z1 - value_name\n" + //
+        "  ; )\n" + //
+        "\n" + //
+        "  ; ; Constants for prob2\n" + //
+        "  ; (:constants\n" + //
+        "  ;   t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 - trace_state\n" + //
+        "  ;   s10 s11 s20 s21 s30 s31 s40 s41 s50 s51 s52 s60 s61 s62 s70 s71 s80 s81 s100 s101 - automaton_state\n" + //
+        "  ;   a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 - activity\n" + //
+        "  ;   int cat - parameter_name\n" + //
+        "  ;   int5 int10 int15 cat1 cat2 cat3 - value_name\n" + //
+        "  ; )\n" + //
+        "\n" + //
+        "  ;; Majority: >=\n" + //
+        "  ;; Minority: <=\n" + //
+        "  ;; Interval: [, ]\n" + //
+        "  ;; Equality: ==\n" + //
+        "  ;; Inequality: !=\n" + //
+        "  ;; If you want only > x, do conditions >= x && != x\n" + //
+        "\n" + //
+        "  (:predicates \n" + //
+        "    ;; TRACES AND AUTOMATONS\n" + //
+        "    (trace ?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
+        "    (automaton ?s1 - automaton_state ?a - activity ?s2 - automaton_state)\n" + //
+        "    (cur_state ?t - trace_state)\n" + //
+        "    (cur_state ?s - automaton_state)\n" + //
+        "\n" + //
+        "    ;; PARAMETER AND CONSTRAINT DECLARATION\n" + //
+        "    (has_parameter ?a - activity ?pn - parameter_name ?t1 - trace_state ?t2 - trace_state)\n" + //
+        "    (has_maj_c ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (has_min_c ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (has_interval_c ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (has_eq_c ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (has_ineq_c ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "\n" + //
+        "    (invalid ?s1 - automaton_state ?a - activity ?s2 - automaton_state)\n" + //
+        "    (complete_sync ?a - activity)\n" + //
+        "    (after_sync)\n" + //
+        "    (after_change)\n" + //
+        "    (adding_value ?a - activity ?t1 - trace_state)\n" + //
+        "    (after_add)\n" + //
+        "\n" + //
+        "    ; Declare this to indicate that such activity-parameter-value assignment exists.\n" + //
+        "    (has_substitution_value ?vn - variable_name ?a - activity ?pn - parameter_name)\n" + //
+        "    ; Indicates that the new activity has a new (defined) parameter.\n" + //
+        "    (has_added_parameter ?a - activity ?par - parameter_name ?t1 - trace_state)\n" + //
+        "\n" + //
+        "    ; Used in the problem definition to indicate that this state must not be reached. In that case, the trace is **automatically** failed.\n" + //
+        "    (failure_state ?s - automaton_state)\n" + //
+        "    ; Used to indicate that the trace alignment couldn't possibly complete: prune -> less branching -> heap won't kaboom.\n" + //
+        "    (failure)\n" + //
+        "  )\n" + //
+        "\n" + //
+        "  (:functions\n" + //
+        "    (total_cost)\n" + //
+        "\n" + //
+        "    ; There exists a value connected to the activity that occures between the two trace states.\n" + //
+        "    (trace_parameter ?a - activity ?pn - parameter_name ?t1 - trace_state ?t2 - trace_state)\n" + //
+        "\n" + //
+        "    (majority_constraint ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (minority_constraint ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (interval_constraint_lower ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (interval_constraint_higher ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (equality_constraint ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "    (inequality_constraint ?a - activity ?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "\n" + //
+        "    ;; VARIABLES SUBSTITUTION / ADDITION\n" + //
+        "    (variable_value ?var - value_name)\n" + //
+        "    (added_parameter ?a - activity ?par - parameter_name ?t1 - trace_state)\n" + //
+        "  )\n" + //
+        "\n" + //
+        "  ;; SYNC OPERATIONS\n" + //
+        "  ;; ----------------------------------------------------------------------------------------------------\n" + //
+        "  (:action sync\n" + //
+        "    :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
+        "    :precondition (and \n" + //
+        "      (cur_state ?t1) \n" + //
+        "      (trace ?t1 ?a ?t2) \n" + //
+        "      (not (after_sync))\n" + //
+        "      (not (after_add))\n" + //
+        "      (not (failure)))\n" + //
+        "    :effect (and \n" + //
+        "      (increase (total_cost) 0)\n" + //
+        "      (not (cur_state ?t1)) \n" + //
+        "      (cur_state ?t2)\n" + //
+        "      (not (after_change))\n" + //
+        "      (after_sync)\n" + //
+        "      (complete_sync ?a)\n" + //
+        "\n" + //
+        "      ; Check if case parameter is missing\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If parameter is missing\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (not (has_parameter ?a ?pn ?t1 ?t2))\n" + //
+        "          (or\n" + //
+        "            (has_maj_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_min_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_interval_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_eq_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_ineq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      ; Check for all conditions if a parameter is missing is not respecting a constraint\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not >=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_parameter ?a ?pn ?t1 ?t2)\n" + //
+        "          (has_maj_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (< (trace_parameter ?a ?pn ?t1 ?t2) (majority_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not <=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_parameter ?a ?pn ?t1 ?t2) \n" + //
+        "          (has_min_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (> (trace_parameter ?a ?pn ?t1 ?t2) (minority_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not [,]\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_parameter ?a ?pn ?t1 ?t2) \n" + //
+        "          (has_interval_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (or\n" + //
+        "            (< (trace_parameter ?a ?pn ?t1 ?t2) (interval_constraint_lower ?a ?pn ?s1 ?s2))\n" + //
+        "            (> (trace_parameter ?a ?pn ?t1 ?t2) (interval_constraint_higher ?a ?pn ?s1 ?s2))\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not =\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_parameter ?a ?pn ?t1 ?t2) \n" + //
+        "          (has_eq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (or \n" + //
+        "            (< (trace_parameter ?a ?pn ?t1 ?t2) (equality_constraint ?a ?pn ?s1 ?s2))\n" + //
+        "            (> (trace_parameter ?a ?pn ?t1 ?t2) (equality_constraint ?a ?pn ?s1 ?s2))\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not !=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_parameter ?a ?pn ?t1 ?t2) \n" + //
+        "          (has_ineq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (= (trace_parameter ?a ?pn ?t1 ?t2) (inequality_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "    )\n" + //
+        "  )\n" + //
+        "\n" + //
+        "  (:action move_automatons\n" + //
+        "    :parameters (?a - activity)\n" + //
+        "    :precondition (and\n" + //
+        "      (not (after_change))\n" + //
+        "      (after_sync)\n" + //
+        "      (complete_sync ?a)\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_add))\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "      (increase (total_cost) 0)\n" + //
+        "      (not (after_sync))\n" + //
+        "      (not (complete_sync ?a))\n" + //
+        "\n" + //
+        "      (forall (?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        (when (and\n" + //
+        "          (not (invalid ?s1 ?a ?s2))\n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (cur_state ?s1)\n" + //
+        "          (not (failure_state ?s2))\n" + //
+        "        ) (and\n" + //
+        "          (not (cur_state ?s1))\n" + //
+        "          (cur_state ?s2)\n" + //
+        "        ))\n" + //
+        "      )\n" + //
+        "      (forall (?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        (when (and\n" + //
+        "          (not (invalid ?s1 ?a ?s2))\n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (cur_state ?s1)\n" + //
+        "          (failure_state ?s2)\n" + //
+        "        ) (and\n" + //
+        "          (not (cur_state ?s1))\n" + //
+        "          (cur_state ?s2)\n" + //
+        "          (failure)\n" + //
+        "        ))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      ;; Clean invalid arcs. In case the same activity repeats, we might have different values and thus different invalid automatons.\n" + //
+        "      (forall (?s1 - automaton_state ?s2 - automaton_state) \n" + //
+        "        (when (after_sync) ; Without the when enclosing, it crashes.\n" + //
+        "          (not (invalid ?s1 ?a ?s2))))\n" + //
+        "      )\n" + //
+        "  )\n" + //
+        "\n" + //
+        "  ;; SUBSTITUTION\n" + //
+        "  ;; ----------------------------------------------------------------------------------------------------\n" + //
+        "  (:action change_value\n" + //
+        "    :parameters (?a - activity ?t1 - trace_state ?t2 - trace_state ?pn - parameter_name ?vn - value_name)\n" + //
+        "    :precondition (and \n" + //
+        "      (trace ?t1 ?a ?t2)\n" + //
+        "      (cur_state ?t1)\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_sync))\n" + //
+        "      (not (after_add))\n" + //
+        "      (has_substitution_value ?vn ?a ?pn)\n" + //
+        "      ; TODO Check this:\n" + //
+        "      (has_parameter ?a ?pn ?t1 ?t2)\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "      (after_change)\n" + //
+        "      (increase (total_cost) " + CHANGE_VALUE_COST + ")\n" + //
+        "      (has_parameter ?a ?pn ?t1 ?t2)\n" + //
+        "      (assign (trace_parameter ?a ?pn ?t1 ?t2) (variable_value ?vn))\n" + //
+        "  ))\n" + //
+        "\n" + //
+        "  ;; ADDITION\n" + //
+        "  ;; ----------------------------------------------------------------------------------------------------\n" + //
+        "  (:action add\n" + //
+        "    :parameters (?a - activity ?t1 - trace_state)\n" + //
+        "    :precondition (and \n" + //
+        "      (cur_state ?t1) \n" + //
+        "      (not (after_change))\n" + //
+        "      (not (after_sync))\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_add))\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "      (increase (total_cost) " + ADD_VALUE_COST + ")\n" + //
+        "      (adding_value ?a ?t1)\n" + //
+        "      (after_add)\n" + //
+        "  ))\n" + //
+        "\n" + //
+        "  (:action set_value\n" + //
+        "    :parameters (?a - activity ?t1 - trace_state ?pn - parameter_name ?vn - value_name)\n" + //
+        "    :precondition (and \n" + //
+        "      (adding_value ?a ?t1)\n" + //
+        "      (cur_state ?t1)\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_change))\n" + //
+        "      (not (after_sync))\n" + //
+        "      (after_add)\n" + //
+        "      (has_substitution_value ?vn ?a ?pn)\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "      (increase (total_cost) " + SET_VALUE_COST + ")\n" + //
+        "      (has_added_parameter ?a ?pn ?t1)\n" + //
+        "      (assign (added_parameter ?a ?pn ?t1) (variable_value ?vn))\n" + //
+        "  ))\n" + //
+        "\n" + //
+        "  (:action check_added_variables\n" + //
+        "    :parameters (?a - activity ?t1 - trace_state)\n" + //
+        "    :precondition (and \n" + //
+        "      (adding_value ?a ?t1)\n" + //
+        "      (cur_state ?t1)\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_change))\n" + //
+        "      (not (after_sync))\n" + //
+        "      (after_add)\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "\n" + //
+        "      (not (adding_value ?a ?t1))\n" + //
+        "      (not (after_add))\n" + //
+        "      (after_sync)\n" + //
+        "      (complete_sync ?a)\n" + //
+        "\n" + //
+        "      ; Check in case parameter is missing\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If parameter is missing\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (not (has_added_parameter ?a ?pn ?t1))\n" + //
+        "          (or\n" + //
+        "            (has_maj_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_min_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_interval_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_eq_c ?a ?pn ?s1 ?s2)\n" + //
+        "            (has_ineq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      ; Check for all conditions if there is something to look for\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not >=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_added_parameter ?a ?pn ?t1)\n" + //
+        "          (has_maj_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (< (added_parameter ?a ?pn ?t1) (majority_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not <=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_added_parameter ?a ?pn ?t1)\n" + //
+        "          (has_min_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (> (added_parameter ?a ?pn ?t1) (minority_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not [,]\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_added_parameter ?a ?pn ?t1)\n" + //
+        "          (has_interval_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (or\n" + //
+        "            (< (added_parameter ?a ?pn ?t1) (interval_constraint_lower ?a ?pn ?s1 ?s2))\n" + //
+        "            (> (added_parameter ?a ?pn ?t1) (interval_constraint_higher ?a ?pn ?s1 ?s2))\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not =\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_added_parameter ?a ?pn ?t1)\n" + //
+        "          (has_eq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (or \n" + //
+        "            (< (added_parameter ?a ?pn ?t1) (equality_constraint ?a ?pn ?s1 ?s2))\n" + //
+        "            (> (added_parameter ?a ?pn ?t1) (equality_constraint ?a ?pn ?s1 ?s2))\n" + //
+        "          ))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      )\n" + //
+        "\n" + //
+        "      (forall (?pn - parameter_name ?s1 - automaton_state ?s2 - automaton_state)\n" + //
+        "        ; If not !=\n" + //
+        "        (when (and \n" + //
+        "          (automaton ?s1 ?a ?s2)\n" + //
+        "          (has_added_parameter ?a ?pn ?t1) \n" + //
+        "          (has_ineq_c ?a ?pn ?s1 ?s2)\n" + //
+        "          (= (added_parameter ?a ?pn ?t1) (inequality_constraint ?a ?pn ?s1 ?s2)))\n" + //
+        "            (invalid ?s1 ?a ?s2))\n" + //
+        "      ))\n" + //
+        "  )\n" + //
+        "\n" + //
+        "  ;; DELETION\n" + //
+        "  ;; ----------------------------------------------------------------------------------------------------\n" + //
+        "  (:action del\n" + //
+        "    :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
+        "    :precondition (and \n" + //
+        "      (cur_state ?t1) \n" + //
+        "      (trace ?t1 ?a ?t2) \n" + //
+        "      (not (after_change))\n" + //
+        "      (not (after_sync))\n" + //
+        "      (not (failure))\n" + //
+        "      (not (after_add))\n" + //
+        "    )\n" + //
+        "    :effect (and \n" + //
+        "      (increase (total_cost) " + DELETE_VALUE_COST + ")\n" + //
+        "      (not (cur_state ?t1)) \n" + //
+        "      (cur_state ?t2))\n" + //
+        "  )\n" + //
+        ")\n" + //
+        "";
   
+  // NOTE DEFINE COSTS ABOVE ^^^
   private final HashMap<String, Activity> activities;
   private final Automaton automaton;
   private final ArrayList<State> acceptingStates;
@@ -51,125 +442,20 @@ public class PDDLGenerator {
   
   
   //Section: Define domain PDDL
+  // public String defineDomain() {
+  //   StringBuilder builder = new StringBuilder(defineDomainDescription(new ArrayList<>(activities.keySet())));
+  //   for (Map.Entry<String, Activity> activityEntry : activities.entrySet()) {
+  //     Activity activity = activityEntry.getValue();
+  //     builder.append(defineAddition(activity)).append(defineDeletion(activity)).append(defineReplacement(activity))
+  //     .append(defineMissingReplacement(activity)).append(defineWrongReplacement(activity));
+  //   }
+  //   builder.append(defineSync()).append(defineGoTo()).append(")");
+  //   return builder.toString();
+  // }
+
   public String defineDomain() {
-    StringBuilder builder = new StringBuilder(defineDomainDescription(new ArrayList<>(activities.keySet())));
-    for (Map.Entry<String, Activity> activityEntry : activities.entrySet()) {
-      Activity activity = activityEntry.getValue();
-      builder.append(defineAddition(activity)).append(defineDeletion(activity)).append(defineReplacement(activity))
-      .append(defineMissingReplacement(activity)).append(defineWrongReplacement(activity));
-    }
-    builder.append(defineSync()).append(defineGoTo()).append(")");
-    return builder.toString();
+    return DOMAIN_STRING;
   }
-  
-  private String defineDomainDescription(ArrayList<String> activityNames) {
-    return "(define (domain Mining)\n" +
-    "\t(:requirements :typing :equality :action-costs :conditional-effects)\n" +
-    "\t(:types\n" +
-    "\t\tstate activity - object\n" +
-    "\t\ttrace_state automaton_state - state\n" +
-    "\t\t" + defineActivityTypes(activityNames) + "\n\t)\n\n" +
-    "\t(:predicates\n" +
-    "\t\t(trace ?t1 - trace_state ?e - activity ?t2 - trace_state)\n" +
-    "\t\t(automaton ?s1 - automaton_state ?e - activity ?s2 - automaton_state)\n" +
-    "\t\t(atoms ?e1 - activity ?e2 - activity)\n" +
-    "\t\t(missing ?e1 - activity ?e2 - activity)\n" +
-    "\t\t(wrong ?e1 - activity ?e2 - activity)\n" +
-    "\t\t(valid ?e1 - activity)\n" +
-    "\t\t(cur_state ?s - state)\n" + "\t\t(final_state ?s - state)\n\t)\n\n" +
-    "\t(:functions\n" + "\t\t(total-cost) - number\n\t)\n\n";
-  }
-  
-  private String defineActivityTypes(ArrayList<String> activityNames) {
-    StringBuilder builder = new StringBuilder();
-    for (String string : activityNames) {
-      builder.append(string).append("_activity ");
-    }
-    builder.append("- activity");
-    return builder.toString();
-  }
-  
-  private String defineAddition(Activity activity) {
-    String activityName = activity.getName();
-    return "\t(:action add_" + activityName + "_activity\n" +
-    "\t\t:parameters (?s1 - automaton_state ?e - " + activityName + "_activity ?s2 - automaton_state)\n" +
-    "\t\t:precondition (and (cur_state ?s1) (automaton ?s1 ?e ?s2))\n" +
-    "\t\t:effect (and (increase (total-cost) " + activity.getAddCost() + ") " +
-    "(not (cur_state ?s1)) (cur_state ?s2)\n\t))\n\n";
-  }
-  
-  private String defineDeletion(Activity activity) {
-    String activityName = activity.getName();
-    return "\t(:action del_" + activityName + "_activity\n" +
-    "\t\t:parameters (?t1 - trace_state ?e - " + activityName + "_activity ?t2 - trace_state)\n" +
-    "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2))\n" +
-    "\t\t:effect (and (increase (total-cost) " + activity.getRemoveCost() + ") " +
-    "(not (cur_state ?t1)) (cur_state ?t2))\n\t)\n\n";
-  }
-  
-  private String defineSync() {
-    return """
-                    \t(:action sync
-                    \t\t:parameters (?t1 - trace_state ?e - activity ?t2 - trace_state)
-                    \t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e ?t2) (valid ?e))
-                    \t\t:effect (and (increase (total-cost) 0) (not (cur_state ?t1)) (cur_state ?t2)
-                    \t\t\t(forall (?s1 ?s2 - automaton_state)
-                    \t\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e ?s2))
-                    \t\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2))
-                    \t))))
-                    
-                    """;
-  }
-  
-  private String defineReplacement(Activity activity) {
-    String activityName = activity.getName();
-    return "\t(:action repl_" + activityName + "_activity\n" +
-    "\t\t:parameters (?t1 - trace_state ?e1 - " + activityName + "_activity ?e2 - " +
-    activityName + "_activity ?t2 - trace_state ?s1 - automaton_state ?s2 - automaton_state)\n" +
-    "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e1 ?t2) (atoms ?e1 ?e2) " +
-    "(cur_state ?s1) (automaton ?s1 ?e2 ?s2))\n" +
-    "\t\t:effect (and (increase (total-cost) " + activity.getReplaceCost() + ") " +
-    "(not (cur_state ?t1)) (cur_state ?t2) (not (cur_state ?s1)) (cur_state ?s2)\n\t))\n\n";
-  }
-  
-  private String defineMissingReplacement(Activity activity) {
-    String activityName = activity.getName();
-    return "\t(:action repl_" + activityName + "_missing\n" +
-    "\t\t:parameters (?t1 - trace_state ?e1 - " + activityName + "_activity ?e2 - " +
-    activityName + "_activity ?t2 - trace_state)\n" +
-    "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e1 ?t2) (missing ?e1 ?e2))\n" +
-    "\t\t:effect (and (increase (total-cost) " + activity.getMissingCost() + ") " +
-    "(not (cur_state ?t1)) (cur_state ?t2)\n" +
-    automatonIterationString();
-  }
-  
-  private String defineWrongReplacement(Activity activity) {
-    String activityName = activity.getName();
-    return "\t(:action repl_" + activityName + "_wrong\n" +
-    "\t\t:parameters (?t1 - trace_state ?e1 - " + activityName + "_activity ?e2 - " +
-    activityName + "_activity ?t2 - trace_state)\n" +
-    "\t\t:precondition (and (cur_state ?t1) (trace ?t1 ?e1 ?t2) (wrong ?e1 ?e2))\n" +
-    "\t\t:effect (and (increase (total-cost) " + activity.getWrongCost() + ") " +
-    "(not (cur_state ?t1)) (cur_state ?t2)\n" +
-    automatonIterationString();
-  }
-  
-  private String automatonIterationString() {
-    return "\t\t\t(forall (?s1 ?s2 - automaton_state)\n" +
-    "\t\t\t\t(when (and (cur_state ?s1) (automaton ?s1 ?e2 ?s2))\n" +
-    "\t\t\t\t\t(and (not (cur_state ?s1)) (cur_state ?s2))\n\t))))\n\n";
-  }
-  
-  private String defineGoTo() {
-    return """             
-                \t(:action goto
-                \t\t:parameters (?s1 - automaton_state ?s2 - automaton_state ?t1 - trace_state)
-                \t\t:precondition (and (final_state ?s1) (cur_state ?s1) (final_state ?t1) (cur_state ?t1))
-                \t\t:effect (and (increase (total-cost) 0) (not (cur_state ?s1)) (cur_state ?s2))
-                \t)
-                """;
-  }
-  
   
   //Section: Generate problem PDDL based on trace
   public String generateProblem(ArrayList<String> sequence) {

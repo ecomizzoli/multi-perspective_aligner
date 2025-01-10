@@ -6,13 +6,13 @@ public class DeclareModel {
   
   private final HashMap<String, Activity> activities;
   private final ArrayList<DeclareConstraint> declareConstraints;
+  private Map<String, Double> costs;
   
   public DeclareModel(Map<String, ArrayList<String[]>> parsedLines) {
-    this.activities = addActivities(parsedLines.get("activityLines"));
-    Map<String, Attribute> attributes = bindAttributes(parsedLines.get("bindingLines"));
+    this.activities = addActivities(parsedLines.get("activityLines")); // ok
+    Map<String, Attribute> attributes = bindAttributes(parsedLines.get("bindingLines")); 
     initializeAttributes(parsedLines.get("intAttributeLines"), parsedLines.get("floatAttributeLines"), parsedLines.get("enumAttributeLines"), attributes);
     this.declareConstraints = addConstraints(parsedLines.get("binaryConstraintLines"), parsedLines.get("unaryConstraintLines"));
-    createPartitions();
   }
   
   
@@ -53,6 +53,20 @@ public class DeclareModel {
     }
   }
   
+  // SECTION - Costs
+  public void assignCosts(String[] costs) {
+    Double[] costsDouble = new Double[4];
+
+    for (int i = 0; i < costs.length; i++) {
+      costsDouble[i] = Double.valueOf(costs[i]);
+    }
+
+    this.costs = new HashMap<>();
+    this.costs.put("change", costsDouble[0]);
+    this.costs.put("add", costsDouble[1]);
+    this.costs.put("set", costsDouble[2]);
+    this.costs.put("delete", costsDouble[3]);
+  }
   
   //Section: Initialization of each attribute and finally removing missing initializations
   private void initializeAttributes(ArrayList<String[]> integers, ArrayList<String[]> floats, ArrayList<String[]> enums, Map<String, Attribute> attributes) {
@@ -100,12 +114,12 @@ public class DeclareModel {
   //Section: Evaluation of each Constraint
   private ArrayList<DeclareConstraint> addConstraints(ArrayList<String[]> binaryConstraints, ArrayList<String[]> unaryConstraints) {
     ArrayList<DeclareConstraint> newConstraints = new ArrayList<>();
-    addUnaryConstraint(newConstraints, unaryConstraints);
-    addBinaryConstraint(newConstraints, binaryConstraints);
+    addUnaryConstraints(newConstraints, unaryConstraints);
+    addBinaryConstraints(newConstraints, binaryConstraints);
     return newConstraints;
   }
   
-  private void addUnaryConstraint(ArrayList<DeclareConstraint> constraints, ArrayList<String[]> unaryConstraints) {
+  private void addUnaryConstraints(ArrayList<DeclareConstraint> constraints, ArrayList<String[]> unaryConstraints) {
     for (String[] line : unaryConstraints) {
       DeclareConstraint constraint = constructUnaryConstraint(line);
       if (constraint != null && constraint.assignConditionsToAttributes(activities)) {
@@ -114,7 +128,7 @@ public class DeclareModel {
     }
   }
   
-  private void addBinaryConstraint(ArrayList<DeclareConstraint> constraints, ArrayList<String[]> binaryConstraints) {
+  private void addBinaryConstraints(ArrayList<DeclareConstraint> constraints, ArrayList<String[]> binaryConstraints) {
     for (String[] line : binaryConstraints) {
       DeclareConstraint constraint = constructBinaryConstraint(line);
       if (constraint != null && constraint.assignConditionsToAttributes(activities)) {
@@ -153,46 +167,6 @@ public class DeclareModel {
       }
     }
     return null;
-  }
-  
-  
-  //Section: Partitioning and cost addition
-  private void createPartitions() {
-    for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-      activity.getValue().decomposeAttributes();
-    }
-  }
-  
-  public void assignCosts(Map<String, int[]> costs) {
-    for (Map.Entry<String, int[]> cost : costs.entrySet()) {
-      Activity activity = activities.get(cost.getKey());
-      if (activity != null) {
-        activity.assignActionCosts(cost.getValue());
-      }
-    }
-  }
-  
-  public HashMap<String, ArrayList<String>> getEquivalenceClasses() {
-    HashMap<String, ArrayList<String>> equivalenceClasses = new HashMap<>();
-    for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-      ArrayList<String> activityEquivalences = new ArrayList<>();
-      for (Map.Entry<String, ArrayList<String>> partition : activity.getValue().getPartitions().entrySet()) {
-        ArrayList<String> equivalenceLine = new ArrayList<>();
-        for (Map.Entry<String, ArrayList<String>> partition2 : activity.getValue().getPartitions().entrySet()) {
-          if (!partition.getKey().equals(partition2.getKey())) {
-            equivalenceLine.add(partition2.getKey());
-          }
-        }
-        equivalenceClasses.put(partition.getKey(), equivalenceLine);
-        activityEquivalences.add(partition.getKey());
-      }
-      if (activity.getValue().getAttributes().isEmpty()) {
-        equivalenceClasses.put(activity.getKey(), activityEquivalences);
-      } else {
-        equivalenceClasses.put(activity.getKey() + "p0", activityEquivalences);
-      }
-    }
-    return equivalenceClasses;
   }
   
   

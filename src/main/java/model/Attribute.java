@@ -9,12 +9,9 @@ public class Attribute {
   private String type;
   private double minValue, maxValue;
   private String[] values;
-  private final ArrayList<Condition> conditions;
-  private ArrayList<Condition> disjointConditions;
   
   public Attribute(String name) {
     this.name = name;
-    this.conditions = new ArrayList<>();
   }
   
   
@@ -130,141 +127,6 @@ public class Attribute {
       return condition.isClosedLeft()? "true" : "false";
     }
   }
-  
-  
-  //Section: Decomposition of attribute
-  public ArrayList<String> decomposeAttribute() {
-    if (disjointConditions != null) {
-      return disjointConditionsToStrings();
-    } else {
-      return type.equals("enum")? decomposeEnumAttribute() : decomposeNumericAttribute();
-    }
-  }
-  
-  private ArrayList<String> decomposeNumericAttribute() {
-    disjointConditions = new ArrayList<>();
-    for (Condition condition : conditions) {
-      //  System.out.println(disjointConditions + " adding " + condition);
-      addToDisjoint(condition);
-    }
-    // System.out.println(disjointConditions);
-    return disjointConditionsToStrings();
-  }
-  
-  private ArrayList<String> disjointConditionsToStrings() {
-    ArrayList<String> disjointIntervalsStrings = new ArrayList<>();
-    for (Condition condition : disjointConditions) {
-      if (condition.getStart() != Double.NEGATIVE_INFINITY && condition.getEnd() != Double.POSITIVE_INFINITY) {
-        disjointIntervalsStrings.add(condition.getRangeString(name));
-      }
-    }
-    return disjointIntervalsStrings;
-  }
-  
-  private ArrayList<String> decomposeEnumAttribute() {
-    ArrayList<String> formatted = new ArrayList<>();
-    for (String value : values) {
-      formatted.add(name + " is " + value);
-    }
-    return formatted;
-  }
-  
-  
-  //TODO: This method is hideous, move some stuff in Condition? Test for = and != both present
-  //Section: Creation of numeric disjoint intervals
-  private void addToDisjoint(Condition condition) {
-    if (disjointConditions.isEmpty()) {
-      evaluateFirstInterval(condition);
-    } else {
-      if (condition.getEnd() == Double.POSITIVE_INFINITY) {
-        int pos = disjointConditions.size() - 1;
-        while (disjointConditions.get(pos - 1).getStart() > condition.getStart()) {
-          pos--;
-        }
-        addGreaterInterval(condition, pos);
-      } else {
-        int pos = 0;
-        while (disjointConditions.get(pos + 1).getEnd() < condition.getEnd()) {
-          pos++;
-        }
-        if (condition.getStart() == Double.NEGATIVE_INFINITY) {
-          addLessInterval(condition, pos);
-        } else {
-          addEqualInterval(condition, pos);
-        }
-      }
-    }
-  }
-  
-  private void evaluateFirstInterval(Condition condition) {
-    String[][] array = new String[][]{{" <= "," > "}, {" < ", " >= "}, {" < ", " >= "}, {" <= ", " > "},
-    {" < ", " = ", " > "}};
-    if (condition.getStart() == Double.NEGATIVE_INFINITY && condition.isClosedRight()) {
-      addFirstIntervals(array[0], condition.getEnd());
-    } else if (condition.getStart() == Double.NEGATIVE_INFINITY && !condition.isClosedRight()) {
-      addFirstIntervals(array[1], condition.getEnd());
-    } else if (condition.getEnd() == Double.POSITIVE_INFINITY && condition.isClosedLeft()) {
-      addFirstIntervals(array[2], condition.getStart());
-    } else if (condition.getEnd() == Double.POSITIVE_INFINITY && !condition.isClosedLeft()) {
-      addFirstIntervals(array[3], condition.getStart());
-    } else {
-      addFirstIntervals(array[4], condition.getStart());
-    }
-  }
-  
-  private void addFirstIntervals(String[] strings, double number) {
-    for (String string : strings) {
-      disjointConditions.add(new Condition(type, name + string + number));
-    }
-  }
-  
-  private void addLessInterval(Condition condition, int pos) {
-    Condition newCondition = new Condition(type, condition.getString());
-    Condition intervalBefore = disjointConditions.get(pos);
-    Condition intervalAfter = disjointConditions.get(pos + 1);
-    if (intervalBefore.getEnd() < newCondition.getEnd()) {
-      newCondition.setStart(intervalBefore.getEnd());
-      newCondition.setClosedLeft(!intervalBefore.isClosedRight());
-      if (intervalAfter.getStart() < newCondition.getEnd()) {
-        intervalAfter.setStart(newCondition.getEnd());
-        intervalAfter.setClosedLeft(!newCondition.isClosedRight());
-      }
-      disjointConditions.add(++pos, newCondition);
-    } else {
-      intervalBefore.setStart(newCondition.getEnd());
-      intervalBefore.setClosedLeft(!newCondition.isClosedRight());
-      disjointConditions.add(0, newCondition);
-    }
-  }
-  
-  private void addGreaterInterval(Condition condition, int pos) {
-    Condition newCondition = new Condition(type, condition.getString());
-    Condition intervalBefore = disjointConditions.get(pos - 1);
-    Condition intervalAfter = disjointConditions.get(pos);
-    if (intervalAfter.getStart() > newCondition.getStart()) {
-      newCondition.setEnd(intervalAfter.getStart());
-      newCondition.setClosedRight(!intervalAfter.isClosedLeft());
-      if (intervalBefore.getEnd() > newCondition.getStart()) {
-        intervalBefore.setEnd(newCondition.getStart());
-        intervalBefore.setClosedRight(!newCondition.isClosedLeft());
-      }
-      disjointConditions.add(pos, newCondition);
-    } else {
-      intervalAfter.setEnd(newCondition.getStart());
-      intervalAfter.setClosedRight(!newCondition.isClosedLeft());
-      disjointConditions.add(disjointConditions.size(), newCondition);
-    }
-  }
-  
-  private void addEqualInterval(Condition condition, int pos) {
-    if (disjointConditions.get(pos).getEnd() == condition.getStart()) {
-      addToDisjoint(new Condition(type,name + " > " + condition.getEnd()));
-    } else {
-      addToDisjoint(new Condition(type,name + " < " + condition.getStart()));
-      addToDisjoint(new Condition(type,name + " > " + condition.getEnd()));
-    }
-  }
-  
   
   @Override
   public boolean equals(Object o) {

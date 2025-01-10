@@ -111,26 +111,6 @@ public class DeclareConstraint {
     }
   }
   
-  
-  //Section: Check accepted partitions for activation and target conditions
-  public String defineActivationPartitioning(Map<String, Activity> activities) {
-    if (template.getFlag().equals("agnostic")) {
-      return activities.get(activationActivity).completePartitioningAsString();
-    } else {
-      return activities.get(activationActivity).getAcceptedPartitions(activationConditionString, activationConditionsList);
-    }
-  }
-  
-  public String defineTargetPartitioning(Map<String, Activity> activities) {
-    if (template.getFlag().equals("agnostic")) {
-      return activities.get(targetActivity).completePartitioningAsString();
-    } else if (template.getFlag().equals("binary")) {
-      return activities.get(targetActivity).getAcceptedPartitions(targetConditionString, targetConditionsList);
-    } else {
-      return null;
-    }
-  }
-  
   @Override
   public String toString() {
     return "[template=" + template + ", activationActivity=" + activationActivity + ", activationCondition=" + activationConditionString

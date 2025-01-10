@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Runner {
   
   public static void main(String[] args) throws Exception {
-    findAlignments(20);
+    findAlignments(20); // Length?
   }
   
   public static void findAlignments(int length) throws Exception {
@@ -17,10 +17,10 @@ public class Runner {
     // Read model and logs to find ltl formula
     IOManager ioManager = IOManager.getInstance();
     
-    DeclareModel model = ioManager.readDeclareModel("recap-model.decl");
+    DeclareModel model = ioManager.readDeclareModel("prob2decl.decl");
     model.assignCosts(ioManager.readCostModel("testing-costModel.txt"));
-    LogFile log = ioManager.readLog("recap-log.xes", model);
-    //System.out.println(log);
+    LogFile log = ioManager.readLog("prob2log.xes", model);
+    System.out.println("Model: " + model);
     
     
     ioManager.exportModel(model);
@@ -37,16 +37,18 @@ public class Runner {
     for (String problem : problems) {
       IOManager.getInstance().exportProblemPDDL(problem, i);
       i++;
+      break; // TODO Remove
     }
     IOManager.getInstance().exportDomainPDDL(domain);
 
     // For each problem, find sequence of actions to solve the trace.
-    Planner planner = new Planner(domain, problems);
-    ArrayList<String> alignments = planner.readProblems();
-    log.repairTraces(alignments, model.getActivities());
-    //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
-    //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
-    IOManager.getInstance().exportLog(log);
+    // Is the following needed?
+    // Planner planner = new Planner(domain, problems);
+    // ArrayList<String> alignments = planner.readProblems();
+    // log.repairTraces(alignments, model.getActivities());
+    // //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
+    // //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
+    // IOManager.getInstance().exportLog(log);
   }
 }
 
