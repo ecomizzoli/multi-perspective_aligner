@@ -6,7 +6,7 @@ public class DeclareModel {
   
   private final HashMap<String, Activity> activities;
   private final ArrayList<DeclareConstraint> declareConstraints;
-  private Map<String, Double> costs;
+  private Map<CostEnum, Double> costs;
   
   public DeclareModel(Map<String, ArrayList<String[]>> parsedLines) {
     this.activities = addActivities(parsedLines.get("activityLines")); // ok
@@ -54,6 +54,10 @@ public class DeclareModel {
   }
   
   // SECTION - Costs
+  /**
+   * Assigns costs to the respective operations
+   * @param costs
+   */
   public void assignCosts(String[] costs) {
     Double[] costsDouble = new Double[4];
 
@@ -62,13 +66,20 @@ public class DeclareModel {
     }
 
     this.costs = new HashMap<>();
-    this.costs.put("change", costsDouble[0]);
-    this.costs.put("add", costsDouble[1]);
-    this.costs.put("set", costsDouble[2]);
-    this.costs.put("delete", costsDouble[3]);
+    this.costs.put(CostEnum.CHANGE, costsDouble[0]);
+    this.costs.put(CostEnum.ADD, costsDouble[1]);
+    this.costs.put(CostEnum.SET, costsDouble[2]);
+    this.costs.put(CostEnum.DELETE, costsDouble[3]);
   }
   
   //Section: Initialization of each attribute and finally removing missing initializations
+  /**
+   * Assigns each of the parsed attriutes to their activities.
+   * @param integers
+   * @param floats
+   * @param enums
+   * @param attributes
+   */
   private void initializeAttributes(ArrayList<String[]> integers, ArrayList<String[]> floats, ArrayList<String[]> enums, Map<String, Attribute> attributes) {
     initializeNumericAttributes("integer", integers, attributes);
     initializeNumericAttributes("float", floats, attributes);
@@ -100,10 +111,17 @@ public class DeclareModel {
     }
   }
   
+  /**
+   * @param subString list written all as string
+   * @return Array of parsed list
+   */
   private String[] extractList(String subString) {
     return subString.replaceAll(" ", "").split(",");
   }
   
+  /**
+   * Cleanup
+   */
   private void removeNotInitAttributes() {
     for (Map.Entry<String, Activity> activity : activities.entrySet()) {
       activity.getValue().getAttributes().removeIf(attribute -> attribute.getType() == null);
@@ -190,5 +208,10 @@ public class DeclareModel {
   
   public ArrayList<DeclareConstraint> getDeclareConstraints()  {
     return declareConstraints;
+  }
+
+  // Costs
+  public Map<CostEnum, Double> getCosts() {
+    return this.costs;
   }
 }

@@ -24,23 +24,12 @@ public class Attribute {
   public void setEnumAttribute(String[] values) {
     this.type = "enum";
     this.values = values;
-    conditions.add(new Condition(type,name + " in " + String.join(", ", values)));
   }
   
   public void setNumericAttribute(String type, double min, double max) {
     this.type = type;
     this.minValue = min;
     this.maxValue = max;
-    conditions.add(new Condition(type,name + " >= " + minValue));
-    conditions.add(new Condition(type,name + " <= " + maxValue));
-  }
-  
-  
-  //Section: Condition addition and consequent validation
-  public void addCondition(Condition condition) {
-    if (!conditions.contains(condition)) {
-      conditions.add(condition);
-    }
   }
   
   public String isConditionValid(Condition condition) {
@@ -140,7 +129,6 @@ public class Attribute {
       stringBuilder.append("values: ").append(Arrays.toString(values)).append("\n");
     } else {
       stringBuilder.append("bounds: [").append(minValue).append(", ").append(maxValue).append("]\n");
-      stringBuilder.append("The followings are my intervals: ").append(disjointConditions).append("\n");
     }
     return stringBuilder.append("\n").toString();
   }

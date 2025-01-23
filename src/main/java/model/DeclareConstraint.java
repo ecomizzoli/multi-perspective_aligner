@@ -2,6 +2,11 @@ package model;
 
 import java.util.*;
 
+import org.processmining.ltl2automaton.plugins.LTL2Automaton;
+import org.processmining.ltl2automaton.plugins.automaton.Automaton;
+
+import translations.DeclareToLTL;
+
 public class DeclareConstraint {
   
   private final DeclareTemplate template;
@@ -9,8 +14,7 @@ public class DeclareConstraint {
   private String activationConditionString, targetConditionString;
   private final ArrayList<Condition> activationConditionsList, targetConditionsList;
   
-  public DeclareConstraint(DeclareTemplate template, String activationActivity, String activationCondition,
-  String targetActivity, String targetCondition) {
+  public DeclareConstraint(DeclareTemplate template, String activationActivity, String activationCondition, String targetActivity, String targetCondition) {
     this.template = template;
     this.activationActivity = activationActivity;
     this.activationConditionString = activationCondition;
@@ -82,7 +86,7 @@ public class DeclareConstraint {
   private boolean validateAttribute(Activity activity, String subConditionString, ArrayList<Condition> conditionList, String flag) {
     Attribute attribute = activity.getAttribute(subConditionString.split("[. ]")[1]);
     if (attribute != null && conditionMatchesType(attribute.getType(), subConditionString)) {
-      validateCondition(attribute, subConditionString, conditionList, flag);
+      // validateCondition(attribute, subConditionString, conditionList, flag);
       return true;
     } else {
       return false;
@@ -93,22 +97,13 @@ public class DeclareConstraint {
     return ((type.equals("integer") || type.equals("float")) && Arrays.stream(new String[]{"=","<",">"}).anyMatch(conditionString::contains)) ||
     (type.equals("enum") && Arrays.stream(new String[]{" is "," in "}).anyMatch(conditionString::contains));
   }
-  
-  private void validateCondition(Attribute attribute, String subConditionString, ArrayList<Condition> conditionList, String flag) {
-    Condition newCondition = new Condition(attribute.getType(), subConditionString.substring(subConditionString.indexOf(".") + 1));
-    String validation = attribute.isConditionValid(newCondition);
-    
-    if (validation.equals("true")) {
-      conditionList.add(newCondition);
-      attribute.addCondition(newCondition);
-    } else if (validation.equals("false")) {
-      conditionList.add(newCondition);
-    } else {
-      Condition adaptedCondition = new Condition(attribute.getType(), validation);
-      conditionList.add(adaptedCondition);
-      attribute.addCondition(adaptedCondition);
-      updateConditionString(newCondition.getString(), adaptedCondition.getString(), flag);
-    }
+
+  // TODO New (move)
+  public String getActivation() {
+    return this.activationActivity;
+  }
+  public String getTarget() {
+    return this.targetActivity;
   }
   
   @Override
@@ -119,5 +114,10 @@ public class DeclareConstraint {
   
   public DeclareTemplate getTemplate() {
     return template;
+  }
+
+  public Automaton getAutomaton() {
+
+    return new Automaton();
   }
 }

@@ -1,10 +1,10 @@
+import java.util.ArrayList;
+
 import log.LogFile;
 import model.DeclareModel;
 import translations.DeclareToLTL;
 import translations.IOManager;
 import translations.PDDLGenerator;
-
-import java.util.ArrayList;
 
 public class Runner {
   
@@ -17,22 +17,24 @@ public class Runner {
     // Read model and logs to find ltl formula
     IOManager ioManager = IOManager.getInstance();
     
-    DeclareModel model = ioManager.readDeclareModel("prob2decl.decl");
-    model.assignCosts(ioManager.readCostModel("testing-costModel.txt"));
-    LogFile log = ioManager.readLog("prob2log.xes", model);
+    DeclareModel model = ioManager.readDeclareModel("prob2decl.decl"); // OKAY!
+    model.assignCosts(ioManager.readCostModel("costModel.txt")); // OKAY!
+
     System.out.println("Model: " + model);
-    
+
+    LogFile log = ioManager.readLog("prob2log.xes", model); // OKAY!
+
+    // System.out.println("Log: " + log);
+
+    // System.out.println("Model: " + model);
     
     ioManager.exportModel(model);
-    String ltlFormula = new DeclareToLTL(model).translateModelToLTL();
-    
-    if (ltlFormula.isBlank()) return;
 
     // If formula exists, define and write PDDL problems.
-    System.out.println(ltlFormula);
-    PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
+    // PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
+    PDDLGenerator pddlGenerator = new PDDLGenerator(model);
     String domain = pddlGenerator.defineDomain();
-    ArrayList<String> problems = log.defineProblems(pddlGenerator);
+    ArrayList<String> problems = log.generateProblems(pddlGenerator);
     int i = 1;
     for (String problem : problems) {
       IOManager.getInstance().exportProblemPDDL(problem, i);
@@ -40,15 +42,6 @@ public class Runner {
       break; // TODO Remove
     }
     IOManager.getInstance().exportDomainPDDL(domain);
-
-    // For each problem, find sequence of actions to solve the trace.
-    // Is the following needed?
-    // Planner planner = new Planner(domain, problems);
-    // ArrayList<String> alignments = planner.readProblems();
-    // log.repairTraces(alignments, model.getActivities());
-    // //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
-    // //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
-    // IOManager.getInstance().exportLog(log);
   }
 }
 

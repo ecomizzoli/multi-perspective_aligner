@@ -1,24 +1,271 @@
 package translations;
 
 import model.Activity;
+import model.Attribute;
+import model.Condition;
+import model.CostEnum;
+import model.DeclareConstraint;
 import model.DeclareModel;
-import org.processmining.ltl2automaton.plugins.LTL2Automaton;
-import org.processmining.ltl2automaton.plugins.automaton.Automaton;
-import org.processmining.ltl2automaton.plugins.automaton.State;
-import org.processmining.ltl2automaton.plugins.automaton.Transition;
-import org.processmining.ltl2automaton.plugins.formula.DefaultParser;
+
+import org.deckfour.xes.extension.std.XConceptExtension;
+import Automaton.Automaton;
+import Automaton.State;
+import Automaton.Transition;
+import log.Event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PDDLGenerator {
 
-  private static final double CHANGE_VALUE_COST = 0.5;
-  private static final double ADD_VALUE_COST = 1;
-  private static final double SET_VALUE_COST = 0.5;
-  private static final double DELETE_VALUE_COST = 1;
-  private static final String DOMAIN_STRING = "(define (domain trace-alignment)\n" + //
+  private static final double CHANGE_DEFAULT_COST = 0.5;
+  private static final double ADD_DEFAULT_COST = 1;
+  private static final double SET_DEFAULT_COST = 0.5;
+  private static final double DELETE_DEFAULT_COST = 1;
+
+  private final Map<CostEnum, Double> costs;
+  
+  // NOTE Define action costs above ^^^
+  private final HashMap<String, Activity> activities;
+  private final ArrayList<DeclareConstraint> constraints;
+  private ArrayList<Automaton> constraintAutomatons;
+  private List<List<State>> goalStates;
+  // private final ArrayList<Transition> relevantTransitions;
+
+  private static final String HEADER_STRING = 
+    "(define (problem prob-trace)\n" + 
+    "  (:domain trace-alignment)\n" + 
+    "\n";
+  private static final String FOOTER_STRING = 
+    "  (:metric minimize (total_cost))\n" +
+    ")\n" +
+    "\n";
+  
+  public PDDLGenerator(DeclareModel model) throws Exception {
+
+    // Get set costs, or use default ones
+    Map<CostEnum, Double> costs = model.getCosts();
+    if (costs != null) {
+      this.costs = costs;
+    } else {
+      costs = new HashMap<>();
+      costs.put(CostEnum.CHANGE, CHANGE_DEFAULT_COST);
+      costs.put(CostEnum.ADD, ADD_DEFAULT_COST);
+      costs.put(CostEnum.SET, SET_DEFAULT_COST);
+      costs.put(CostEnum.DELETE, DELETE_DEFAULT_COST);
+
+      this.costs = costs;
+    }
+
+    this.activities = model.getActivities();
+    this.constraints = model.getDeclareConstraints();
+    this.constraints.forEach(x -> System.out.println(x));
+    this.constraintAutomatons = new ArrayList<>();
+    this.goalStates = new ArrayList<>();
+  }
+
+  public String defineProblem(ArrayList<Event> listOfEvents) {
+
+    Map<Event, Map<Attribute, String>> attributes = this.parseEvents(listOfEvents);
+    List<State> finalAutomatonStates = new ArrayList<>();
+
+    StringBuilder s = new StringBuilder();
+    s.append(PDDLGenerator.HEADER_STRING);
+    s.append(this.buildObjectsString(attributes));
+    // s.append(this.buildSubstitutionValues());
+    s.append(this.buildTraceDeclaration(listOfEvents, attributes));
+    s.append(this.buildAutomatons(finalAutomatonStates));
+    s.append(this.buildGoals());
+    s.append(PDDLGenerator.FOOTER_STRING);
+    return s.toString();
+  }
+
+  private Map<Event, Map<Attribute, String>> parseEvents(ArrayList<Event> events) {
+    
+    int index = 0;
+    Map<Event, Map<Attribute, String>> assignments = new HashMap<>();
+    for(Event event : events) {
+      event.setName("t" + index++); // Assign event name that will be put in the PDDL.
+      if (index == 1) {
+        State finalTraceState = new State();
+        finalTraceState.name = event.getName();
+        this.goalStates.add(List.of(finalTraceState));
+      }
+      assignments.put(event, event.getAttributeAssignments());
+    }
+    return assignments;
+  }
+
+  private StringBuilder buildObjectsString(Map<Event, Map<Attribute, String>> attributeAssignments) {
+    StringBuilder b = new StringBuilder();
+    b.append("  (:objects\n");
+
+    // TRACE STATES
+    b.append("    ");
+    attributeAssignments.keySet().forEach(x -> b.append(x.getName() + " "));
+    b.append("- trace_state\n");
+
+
+    // AUTOMATON STATES
+    int index = 1;
+    for (DeclareConstraint constraint : this.constraints) {
+      String prefix = "s" + index++ + "_";
+      Automaton newAutomaton = new Automaton(prefix, constraint);
+      this.constraintAutomatons.add(newAutomaton);
+      
+      // Automaton might have more than one goal state. In that case, we'll put the goal states with an "or" between them.
+      List<State> goalStates = newAutomaton.getStates().stream()
+                                  .filter(x -> x.isFinal)
+                                  .toList();
+
+      this.goalStates.add(goalStates);
+    }
+    b.append("    ");
+    this.constraintAutomatons.forEach(x -> {
+      x.getStates().forEach(y -> {
+        b.append(y.name + " ");
+      });
+    });
+    b.append("- automaton_state\n");
+
+    // ACTIVITIES
+    b.append("    ");
+    this.activities.keySet().forEach(x -> b.append(x + " "));
+    b.append("- activity\n");
+
+    // ATTRIBUTES
+    Set<String> attributes = attributeAssignments.values()
+      .stream()
+      .flatMap(x -> x.keySet().stream())
+      .map(x -> x.getName())
+      .collect(Collectors.toSet());
+    b.append("    ");
+    attributes.forEach(x -> b.append(x + " "));
+    b.append("- parameter_name\n");
+
+    // TODO Substitution values
+    // b.append("    ");
+    // this.activities.keySet().forEach(x -> b.append(x + " "));
+    // b.append("- activity");
+
+    b.append("  )\n");
+    return b;
+  }
+  private StringBuilder buildTraceDeclaration(List<Event> events, Map<Event, Map<Attribute, String>> assignments) {
+    StringBuilder b = new StringBuilder();
+    b.append("  ;; TRACE DECLARATION\n");
+    b.append("  (:init\n");
+
+    b.append("    (cur_state " + events.get(0).getName() + ")\n");
+    Iterator<Event> it1 = events.iterator();
+    Event cur;
+
+    Iterator<Event> it2 = events.iterator();
+    Event next;
+    if (it2.hasNext()) {
+      next = it2.next();
+    }
+    String activity;
+
+
+    while (it2.hasNext()) {
+      cur = it1.next();
+      next = it2.next();
+
+      activity = XConceptExtension.instance().extractName(cur.getXEvent());
+      b.append("    (trace " + cur.getName() + " " + activity + " " + next.getName() + ")\n");
+      for(Map.Entry<Attribute, String> singleAssignment : assignments.get(cur).entrySet()) {
+        String value = singleAssignment.getValue();
+        value = value.replaceAll("[a-zA-Z]", ""); // Remove chars, use as if numbers (in case of enum types)
+
+        b.append("    (has_parameter " + activity + " " + singleAssignment.getKey().getName() + " " + cur.getName() + " " + next.getName() + ")\n");
+        b.append("    (= (trace_parameter " + activity + " " + singleAssignment.getKey().getName() + " " + cur.getName() + " " + next.getName() + ") " + value + ")\n");
+        b.append("\n");
+      }
+    }
+
+    return b;
+  }
+
+  public StringBuilder buildAutomatons(List<State> finalAutomatonStates) {
+    StringBuilder b = new StringBuilder();
+    b.append("    ;; AUTOMATON STATES\n");
+
+    int index = 1; // Indicates number of automaton
+    for (Automaton aut : this.constraintAutomatons) {
+      
+      for (State state : aut.getStates()) {
+        if (state.isInitial) {
+          b.append("    (cur_state " + "s" + index + "_" + state.name + ")\n");
+        }
+        if (state.isFailure) {
+          b.append("    (failure_state " + "s" + index + "_" + state.name + ")\n");
+        }
+      }
+
+      for (Transition t : aut.getTransitions()) {
+        b.append("    (automaton " + "s" + index + "_" + t.getActiviationState().name + " " + 
+            t.getActivity() + " " + 
+            "s" + index + "_" + t.getTargetState().name + ")\n");
+
+        List<Condition> conditions = t.getReformedConditions();
+        for (Condition c : conditions) {
+          b.append(this.getConditionString(c));
+        }
+      }
+    
+      b.append("\n");
+      index++;
+    }
+
+    // Close init
+    b.append("  )\n");
+    return b;
+  }
+  private StringBuilder getConditionString(Condition c) {
+    StringBuilder b = new StringBuilder();
+
+    // TODO
+    // Automaton will alreeady have all the conditions in place. Simple print formatted conditions out
+
+
+    return b;
+  }
+  private StringBuilder buildGoals() {
+    StringBuilder b = new StringBuilder();
+
+    b.append("  ;; GOAL STATES\n");
+    b.append("  (:goal (and\n");
+
+    for (List<State> goalStates : this.goalStates) {
+      if (goalStates.size() == 1) {
+        b.append("    (cur_state " + goalStates.get(0).name + ")\n");
+      } else { // In case two or more
+
+        b.append("    (or\n");
+        for (State singleGoal : goalStates) {
+          b.append("      (cur_state " + singleGoal.name + ")\n");
+        }
+        b.append("    )\n");
+      }
+    }
+
+    b.append("    (not (failure))\n" +
+            "    (not (after_change))\n" + //
+            "    (not (after_add))\n" + //
+            "    (not (after_sync))\n" + //
+            "  )\n\n"
+    );
+    return b;
+  }
+
+  public String defineDomain() {
+    return "(define (domain trace-alignment)\n" + //
         "\n" + //
         "  (:requirements :strips :typing :equality :adl :fluents :action-costs)\n" + //
         "\n" + //
@@ -254,7 +501,7 @@ public class PDDLGenerator {
         "    )\n" + //
         "    :effect (and \n" + //
         "      (after_change)\n" + //
-        "      (increase (total_cost) " + CHANGE_VALUE_COST + ")\n" + //
+        "      (increase (total_cost) " + this.costs.get(CostEnum.CHANGE) + ")\n" + //
         "      (has_parameter ?a ?pn ?t1 ?t2)\n" + //
         "      (assign (trace_parameter ?a ?pn ?t1 ?t2) (variable_value ?vn))\n" + //
         "  ))\n" + //
@@ -271,7 +518,7 @@ public class PDDLGenerator {
         "      (not (after_add))\n" + //
         "    )\n" + //
         "    :effect (and \n" + //
-        "      (increase (total_cost) " + ADD_VALUE_COST + ")\n" + //
+        "      (increase (total_cost) " + this.costs.get(CostEnum.ADD) + ")\n" + //
         "      (adding_value ?a ?t1)\n" + //
         "      (after_add)\n" + //
         "  ))\n" + //
@@ -288,7 +535,7 @@ public class PDDLGenerator {
         "      (has_substitution_value ?vn ?a ?pn)\n" + //
         "    )\n" + //
         "    :effect (and \n" + //
-        "      (increase (total_cost) " + SET_VALUE_COST + ")\n" + //
+        "      (increase (total_cost) " + this.costs.get(CostEnum.SET) + ")\n" + //
         "      (has_added_parameter ?a ?pn ?t1)\n" + //
         "      (assign (added_parameter ?a ?pn ?t1) (variable_value ?vn))\n" + //
         "  ))\n" + //
@@ -397,203 +644,11 @@ public class PDDLGenerator {
         "      (not (after_add))\n" + //
         "    )\n" + //
         "    :effect (and \n" + //
-        "      (increase (total_cost) " + DELETE_VALUE_COST + ")\n" + //
+        "      (increase (total_cost) " + this.costs.get(CostEnum.DELETE) + ")\n" + //
         "      (not (cur_state ?t1)) \n" + //
         "      (cur_state ?t2))\n" + //
         "  )\n" + //
         ")\n" + //
         "";
-  
-  // NOTE DEFINE COSTS ABOVE ^^^
-  private final HashMap<String, Activity> activities;
-  private final Automaton automaton;
-  private final ArrayList<State> acceptingStates;
-  private final ArrayList<Transition> relevantTransitions;
-  
-  
-  public PDDLGenerator(DeclareModel model, String ltlString) throws Exception {
-    this.activities = model.getActivities();
-    this.automaton = LTL2Automaton.getInstance().translate(new DefaultParser(ltlString).parse());
-    this.acceptingStates = findAcceptingStates();
-    this.relevantTransitions = findRelevantTransitions();
-    IOManager.getInstance().exportToDot(automaton);
-  }
-  
-  
-  private ArrayList<Transition> findRelevantTransitions() {
-    ArrayList<Transition> relevantTransitions = new ArrayList<>();
-    for (Transition transition : automaton.transitions()) {
-      if (transition.getSource().getId() != transition.getTarget().getId()) {
-        relevantTransitions.add(transition);
-      }
-    }
-    return relevantTransitions;
-  }
-  
-  private ArrayList<State> findAcceptingStates() {
-    ArrayList<State> acceptingS = new ArrayList<>();
-    for (State state : automaton) {
-      if (state.isAccepting()) {
-        acceptingS.add(state);
-      }
-    }
-    return acceptingS;
-  }
-  
-  
-  //Section: Define domain PDDL
-  // public String defineDomain() {
-  //   StringBuilder builder = new StringBuilder(defineDomainDescription(new ArrayList<>(activities.keySet())));
-  //   for (Map.Entry<String, Activity> activityEntry : activities.entrySet()) {
-  //     Activity activity = activityEntry.getValue();
-  //     builder.append(defineAddition(activity)).append(defineDeletion(activity)).append(defineReplacement(activity))
-  //     .append(defineMissingReplacement(activity)).append(defineWrongReplacement(activity));
-  //   }
-  //   builder.append(defineSync()).append(defineGoTo()).append(")");
-  //   return builder.toString();
-  // }
-
-  public String defineDomain() {
-    return DOMAIN_STRING;
-  }
-  
-  //Section: Generate problem PDDL based on trace
-  public String generateProblem(ArrayList<String> sequence) {
-    return "(define (problem Align)\n(:domain Mining)\n" + defineObjects(sequence.size()) +
-    defineInit(sequence) + defineGoal(sequence.size()) + ")";
-  }
-  
-  private String defineObjects(int traceSize) {
-    return "(:objects\n" + defineTraceObjects(traceSize) + defineAutomataObjects() + defineActivityObjects() + ")\n";
-  }
-  
-  private String defineTraceObjects(int traceSize) {
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i <= traceSize; i++) {
-      builder.append("t").append(i).append(" ");
-    }
-    builder.append("- trace_state\n");
-    return builder.toString();
-  }
-  
-  private String defineAutomataObjects() {
-    StringBuilder builder = new StringBuilder();
-    for (State state : automaton) {
-      builder.append(state).append(" ");
-    }
-    builder.append("s_abstract - automaton_state\n");
-    return builder.toString();
-  }
-  
-  private String defineActivityObjects() {
-    StringBuilder builder = new StringBuilder();
-    for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-      if (activity.getValue().getPartitions().isEmpty()) {
-        builder.append(activity.getKey()).append(" - ").append(activity.getKey()).append("_activity\n");
-      } else {
-        for (String partition : activity.getValue().getPartitions().keySet()) {
-          builder.append(partition).append(" ");
-        }
-        builder.append(activity.getKey()).append("_missing ").append(activity.getKey()).append("_wrong ")
-        .append("- ").append(activity.getKey()).append("_activity\n");
-      }
-    }
-    return builder.toString();
-  }
-  
-  private String defineInit(ArrayList<String> sequence) {
-    return "(:init\n(cur_state " + automaton.getInit() + ") (cur_state t0)\n" + defineFinalStates(sequence.size()) +
-    defineTraceTransitions(sequence) + defineAutomataTransitions() + defineValidityBasedPredicates() +
-    defineAtomsPredicates() + "(= (total-cost) 0)\n)\n";
-  }
-  
-  private String defineFinalStates(int traceSize) {
-    StringBuilder builder = new StringBuilder();
-    for (State state : acceptingStates) {
-      builder.append("(final_state ").append(state).append(") ");
-    }
-    builder.append("(final_state t").append(traceSize).append(")\n");
-    return builder.toString();
-  }
-  
-  private String defineTraceTransitions(ArrayList<String> sequence) {
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < sequence.size(); i++) {
-      builder.append("(trace t").append(i).append(" ").append(sequence.get(i)).append(" t").append(i + 1).append(")\n");
-    }
-    return builder.toString();
-  }
-  
-  private String defineAutomataTransitions() {
-    StringBuilder builder = new StringBuilder();
-    for (Transition transition : relevantTransitions) {
-      if (!transition.isNegative()) {
-        builder.append("(automaton ").append(transition.getSource()).append(" ")
-        .append(transition.getPositiveLabel()).append(" ").append(transition.getTarget()).append(")\n");
-      } else {
-        for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-          if (activity.getValue().getPartitions().isEmpty()) {
-            builder.append("(automaton ").append(transition.getSource()).append(" ")
-            .append(activity.getKey()).append(" ").append(transition.getTarget()).append(")\n");
-          }
-          for (String partitionKey : activity.getValue().getPartitions().keySet()) {
-            if (!transition.getNegativeLabels().contains(partitionKey)) {
-              builder.append("(automaton ").append(transition.getSource()).append(" ")
-              .append(partitionKey).append(" ").append(transition.getTarget()).append(")\n");
-            }
-          }
-        }
-      }
-    }
-    return builder.toString();
-  }
-  
-  private String defineValidityBasedPredicates() {
-    StringBuilder builder = new StringBuilder();
-    StringBuilder validAtoms = new StringBuilder();
-    StringBuilder wrongReplacements = new StringBuilder();
-    StringBuilder missingReplacements = new StringBuilder();
-    for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-      if (activity.getValue().getPartitions().isEmpty()) {
-        validAtoms.append("(valid ").append(activity.getKey()).append(")\n");
-      } else if (activity.getValue().getPartitions().size() == 1) {
-        validAtoms.append("(valid ").append(activity.getKey()).append("_p1)\n");
-      } else {
-        for (String partition : activity.getValue().getPartitions().keySet()) {
-          validAtoms.append("(valid ").append(partition).append(") ");
-          wrongReplacements.append("(missing ").append(activity.getKey()).append("_missing ").append(partition).append(") ");
-          missingReplacements.append("(wrong ").append(activity.getKey()).append("_wrong ").append(partition).append(") ");
-        }
-        wrongReplacements.append("\n");
-        missingReplacements.append("\n");
-        validAtoms.append("\n");
-      }
-    }
-    return builder.append(validAtoms).append(missingReplacements).append(wrongReplacements).toString();
-  }
-  
-  private String defineAtomsPredicates() {
-    StringBuilder builder = new StringBuilder();
-    for (Map.Entry<String, Activity> activity : activities.entrySet()) {
-      if (activity.getValue().getPartitions().size() > 1) {
-        for (String partitionSource : activity.getValue().getPartitions().keySet()) {
-          for (String partitionTarget : activity.getValue().getPartitions().keySet()) {
-            if (!partitionSource.equals(partitionTarget)) {
-              builder.append("(atoms ").append(partitionSource).append(" ").append(partitionTarget).append(") ");
-            }
-          }
-          builder.append("\n");
-        }
-      }
-    }
-    return builder.toString();
-  }
-  
-  
-  
-  private String defineGoal(int traceSize) {
-    return "(:goal\n" + "(and " + "(cur_state t" + traceSize + ") " +
-    "(cur_state s_abstract)\n" + "))\n" +
-    "(:metric minimize (total-cost))\n";
   }
 }

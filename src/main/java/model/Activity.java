@@ -27,10 +27,6 @@ public class Activity {
     for (Attribute attribute : attributes) {
       builder.append(attribute);
     }
-    builder.append("The followings are my partitions: ").append(partitions).append("\n");
-    builder.append("With following costs: Add -> ").append(addCost).append(", Remove -> ").append(removeCost)
-    .append(", Replace -> ").append(replaceCost).append(", Extra cost for wrong attributes -> ")
-    .append(extraWrongCost).append(", Extra cost for missing attributes -> ").append(extraMissingCost);
     builder.append("\n");
     return builder.toString();
   }
@@ -47,32 +43,8 @@ public class Activity {
   public String getName() {
     return name;
   }
-  
-  public ArrayList<Attribute> getAttributes() {
-    return attributes;
-  }
-  
-  public Map<String, ArrayList<String>> getPartitions () {
-    return partitions;
-  }
-  
-  public int getAddCost() {
-    return addCost;
-  }
-  
-  public int getRemoveCost() {
-    return removeCost;
-  }
-  
-  public int getReplaceCost() {
-    return replaceCost;
-  }
-  
-  public int getMissingCost() {
-    return replaceCost + extraMissingCost;
-  }
-  
-  public int getWrongCost() {
-    return replaceCost + extraWrongCost;
+
+  public Set<Attribute> getAttributes() {
+    return this.attributes;
   }
 }

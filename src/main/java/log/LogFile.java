@@ -17,6 +17,12 @@ public class LogFile {
     this.traces = findTraces(xLog, declareModel.getActivities());
   }
   
+  /**
+   * Build list of Trace objects from given XLog object
+   * @param xlog
+   * @param activityMap
+   * @return
+   */
   public ArrayList<Trace> findTraces(XLog xlog, Map<String, Activity> activityMap) {
     ArrayList<Trace> newTraces = new ArrayList<>();
     if (xlog != null) {
@@ -27,10 +33,10 @@ public class LogFile {
     return newTraces;
   }
   
-  public ArrayList<String> defineProblems(PDDLGenerator pddlGenerator) {
+  public ArrayList<String> generateProblems(PDDLGenerator pddlGenerator) {
     ArrayList<String> problems = new ArrayList<>();
     for (Trace trace : traces) {
-      problems.add(pddlGenerator.generateProblem(trace.getSequence("original")));
+      problems.add(pddlGenerator.defineProblem(trace.getTrace()));
     }
     return problems;
   }

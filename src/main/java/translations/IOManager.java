@@ -245,7 +245,7 @@ public class IOManager {
     File costModel = new File(inputFolder + costsFileName);
     String[] costs = new String[] {};
     try (Scanner scanner = new Scanner(costModel)) {
-      while (scanner.hasNextLine()) {
+      if (scanner.hasNextLine()) {
         costs = scanner.nextLine().split(" ");
       }
     } catch (IOException e) {

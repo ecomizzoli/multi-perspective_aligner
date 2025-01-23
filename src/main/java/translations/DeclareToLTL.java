@@ -9,25 +9,37 @@ public class DeclareToLTL {
   private final DeclareModel model;
   private static final String OR = "\\/", AND = "/\\";
   
+  public DeclareToLTL(DeclareConstraint constraint) {
+    this.model = null;
+
+    DeclareTemplate template = constraint.getTemplate();
+    String activiationString = constraint.getActivation();
+    String targetString = constraint.getTarget();
+
+    String res = addToFormula(template, activiationString, targetString);
+
+    System.out.println("Res: " + res);
+  }
+
   public DeclareToLTL(DeclareModel declareModel) {
     this.model = declareModel;
   }
   
-  // TODO: provare con ltl vuota
-  // Section: Translation of declare model constraints into LTL formula
-  public String translateModelToLTL() {
-    StringBuilder formulaBuilder = new StringBuilder();
-    for (DeclareConstraint constraint : model.getDeclareConstraints()) {
-      DeclareTemplate template = constraint.getTemplate();
-      String activationString = constraint.defineActivationPartitioning(model.getActivities());
-      String targetString = constraint.defineTargetPartitioning(model.getActivities());
-      if (isConstraintAcceptable(template.getFlag(), activationString, targetString)) {
-        String newFormula = addToFormula(template, activationString, targetString);
-        formulaBuilder.append(newFormula).append(" " + AND + " ");
-      }
-    }
-    return formulaBuilder.isEmpty() ? formulaBuilder.toString() : formulaBuilder.substring(0, formulaBuilder.length() - 4);
-  }
+  // // TODO: provare con ltl vuota
+  // // Section: Translation of declare model constraints into LTL formula
+  // public String translateModelToLTL() {
+  //   StringBuilder formulaBuilder = new StringBuilder();
+  //   for (DeclareConstraint constraint : model.getDeclareConstraints()) {
+  //     DeclareTemplate template = constraint.getTemplate();
+  //     String activationString = constraint.getActivation(model.getActivities());
+  //     String targetString = constraint.getTarget(model.getActivities());
+  //     if (isConstraintAcceptable(template.getFlag(), activationString, targetString)) {
+  //       String newFormula = addToFormula(template, activationString, targetString);
+  //       formulaBuilder.append(newFormula).append(" " + AND + " ");
+  //     }
+  //   }
+  //   return formulaBuilder.isEmpty() ? formulaBuilder.toString() : formulaBuilder.substring(0, formulaBuilder.length() - 4);
+  // }
   
   private boolean isConstraintAcceptable(String flag, String aPartition, String tPartition) {
     return flag.equals("unary")? aPartition != null : aPartition != null && tPartition != null;
