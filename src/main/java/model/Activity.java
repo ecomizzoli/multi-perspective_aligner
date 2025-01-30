@@ -6,7 +6,6 @@ public class Activity {
   
   private final String name;
   private Set<Attribute> attributes;
-  private Map<Attribute, Set<Integer>> substitutionValues; // TODO Instead of integer, should be generally Value
   
   public Activity(String name) {
     this.name = name;

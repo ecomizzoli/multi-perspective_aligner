@@ -4,10 +4,13 @@ import model.Activity;
 import model.DeclareModel;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+
+import Automaton.VariableSubstitution;
 import translations.PDDLGenerator;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 public class LogFile {
   
@@ -33,10 +36,10 @@ public class LogFile {
     return newTraces;
   }
   
-  public ArrayList<String> generateProblems(PDDLGenerator pddlGenerator) {
+  public ArrayList<String> generateProblems(PDDLGenerator pddlGenerator, Map<String, Integer> assignments, Set<VariableSubstitution> substitutions) {
     ArrayList<String> problems = new ArrayList<>();
     for (Trace trace : traces) {
-      problems.add(pddlGenerator.defineProblem(trace.getTrace()));
+      problems.add(pddlGenerator.defineProblem(trace.getTrace(), assignments, substitutions));
     }
     return problems;
   }

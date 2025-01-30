@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file has been generated with the OpenXES library. It conforms -->
+<!-- to the XML serialization of the XES standard for log storage and -->
+<!-- management. -->
+<!-- XES standard version: 1.0 -->
+<!-- OpenXES library version: 1.0RC7 -->
+<!-- OpenXES is available from http://www.openxes.org/ -->
+<log xes.version="1.0" xes.features="nested-attributes" openxes.version="1.0RC7">
+	<trace>
+		<string key="concept:name" value="Case No. 1 [positive]"/>
+		<string key="trace:type" value="positive"/>
+		<event>
+			<string key="categorical" value="c1"/>
+			<int key="integer" value="13"/>
+			<string key="concept:name" value="a7"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T18:55:36.592+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c1"/>
+			<int key="integer" value="11"/>
+			<string key="concept:name" value="a2"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T19:41:31.404+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c3"/>
+			<int key="integer" value="2"/>
+			<string key="concept:name" value="a8"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T19:59:25.135+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c3"/>
+			<int key="integer" value="61"/>
+			<string key="concept:name" value="a5"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T20:00:34.737+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c1"/>
+			<int key="integer" value="12"/>
+			<string key="concept:name" value="a7"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T20:25:31.164+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c3"/>
+			<int key="integer" value="11"/>
+			<string key="concept:name" value="a10"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T20:49:21.719+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c3"/>
+			<int key="integer" value="0"/>
+			<string key="concept:name" value="a10"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T21:25:52.625+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c1"/>
+			<int key="integer" value="94"/>
+			<string key="concept:name" value="a7"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T21:53:43.974+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c1"/>
+			<int key="integer" value="4"/>
+			<string key="concept:name" value="a3"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T21:56:00.234+01:00"/>
+		</event>
+		<event>
+			<string key="categorical" value="c2"/>
+			<int key="integer" value="11"/>
+			<string key="concept:name" value="a4"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2025-01-27T22:25:51.533+01:00"/>
+		</event>
+	</trace>
+</log>

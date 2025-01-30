@@ -2,17 +2,12 @@ package model;
 
 import java.util.*;
 
-import org.processmining.ltl2automaton.plugins.LTL2Automaton;
-import org.processmining.ltl2automaton.plugins.automaton.Automaton;
-
-import translations.DeclareToLTL;
-
 public class DeclareConstraint {
   
   private final DeclareTemplate template;
   private final String activationActivity, targetActivity;
   private String activationConditionString, targetConditionString;
-  private final ArrayList<Condition> activationConditionsList, targetConditionsList;
+  private ArrayList<Condition> activationConditionsList, targetConditionsList;
   
   public DeclareConstraint(DeclareTemplate template, String activationActivity, String activationCondition, String targetActivity, String targetCondition) {
     this.template = template;
@@ -20,8 +15,44 @@ public class DeclareConstraint {
     this.activationConditionString = activationCondition;
     this.targetActivity = targetActivity;
     this.targetConditionString = targetCondition;
-    this.activationConditionsList = new ArrayList<>();
-    this.targetConditionsList = new ArrayList<>();
+
+    this.activationConditionsList = this.parseConditionList(activationActivity, activationCondition);
+    this.targetConditionsList = this.parseConditionList(targetActivity, targetCondition);
+  }
+  private ArrayList<Condition> parseConditionList(String activityName, String conditionsString) {
+    if (activityName == null || conditionsString == null) return null; // For unary constraints
+
+    ArrayList<Condition> conditions = new ArrayList<>();
+
+    if (conditionsString.contains(" or ")) { // leave spaces _or_!
+      throw new Error("Conditions with OR currently unsupported!");
+    }
+
+    String[] strings = conditionsString.split("and");
+    for (String str : strings) {
+      str = str.strip();
+      String[] stuff = str.split(" ");
+
+      stuff[0] = stuff[0].replace("A.", "");
+      stuff[0] = stuff[0].replace("T.", "");
+
+      OperatorType o = switch(stuff[1]) {
+        case ">" -> OperatorType.BIGGER;
+        case ">=" -> OperatorType.BIGGER_OR_EQUAL;
+        case "is" -> OperatorType.EQUAL;
+        case "<>" -> OperatorType.NOT_EQUAL; // TODO Check
+        case "<" -> OperatorType.LESS;
+        case "<=" -> OperatorType.LESS_OR_EQUAL;
+        default -> null;
+      };
+
+      stuff[2] = stuff[2].replaceAll("[a-zA-Z]", "");
+
+      Condition c = new Condition(activityName, stuff[0], o, Integer.valueOf(stuff[2]));
+      conditions.add(c);
+    }
+
+    return conditions;
   }
   
   
@@ -98,12 +129,17 @@ public class DeclareConstraint {
     (type.equals("enum") && Arrays.stream(new String[]{" is "," in "}).anyMatch(conditionString::contains));
   }
 
-  // TODO New (move)
   public String getActivation() {
     return this.activationActivity;
   }
   public String getTarget() {
     return this.targetActivity;
+  }
+  public List<Condition> getActivationConditions() {
+    return this.activationConditionsList;
+  }
+  public List<Condition> getTargetConditions() {
+    return this.targetConditionsList;
   }
   
   @Override
@@ -114,10 +150,5 @@ public class DeclareConstraint {
   
   public DeclareTemplate getTemplate() {
     return template;
-  }
-
-  public Automaton getAutomaton() {
-
-    return new Automaton();
   }
 }

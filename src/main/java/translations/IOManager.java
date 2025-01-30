@@ -6,6 +6,9 @@ import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
 import org.processmining.ltl2automaton.plugins.automaton.Automaton;
 import org.processmining.ltl2automaton.plugins.automaton.DOTExporter;
+
+import Automaton.VariableSubstitution;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,6 +53,54 @@ public class IOManager {
       System.out.println("Error reading the declare file");
     }
     return lines;
+  }
+
+  public Map<String, Integer> readVariableAssignments(String fileName) {
+    HashMap<String, Integer> map = new HashMap<>();
+    File variablesFile = new File(this.inputFolder + fileName);
+
+    try (Scanner scanner = new Scanner(variablesFile)) {
+      while (scanner.hasNextLine()) {
+
+        String line = scanner.nextLine();
+        String[] read = line.split(" ");
+        if (read.length != 2) {
+          throw new Error("Parsing error!");
+        }
+
+        map.put(read[0], Integer.valueOf(read[1]));
+      }
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+
+    return map;
+  }
+  public Set<VariableSubstitution> readVariablesSubstitutions(String fileName) {
+    HashSet<VariableSubstitution> set = new HashSet<>();
+
+    File assignmentFile = new File(this.inputFolder + fileName);
+    try (Scanner scanner = new Scanner(assignmentFile)) {
+      while (scanner.hasNextLine()) {
+
+        String line = scanner.nextLine();
+        String[] read = line.split(" ");
+        if (read.length != 3) {
+          throw new Error("Parsing error!");
+        }
+
+        VariableSubstitution va = new VariableSubstitution();
+        va.variableName = read[0];
+        va.activityName = read[1];
+        va.categoryName = read[2];
+
+        set.add(va);
+      }
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+    
+    return set;
   }
   
   private HashMap<String, ArrayList<String[]>> initializeSortingMap() {
@@ -171,8 +222,6 @@ public class IOManager {
     Matcher listMatcher = patterns[9].matcher(condition);
     return numericMatcher.find() || enumMatcher.find() || listMatcher.find();
   }
-  
-  
   
   
   

@@ -11,6 +11,7 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import Automaton.Automaton;
 import Automaton.State;
 import Automaton.Transition;
+import Automaton.VariableSubstitution;
 import log.Event;
 
 import java.util.ArrayList;
@@ -64,22 +65,23 @@ public class PDDLGenerator {
 
     this.activities = model.getActivities();
     this.constraints = model.getDeclareConstraints();
-    this.constraints.forEach(x -> System.out.println(x));
     this.constraintAutomatons = new ArrayList<>();
     this.goalStates = new ArrayList<>();
   }
 
-  public String defineProblem(ArrayList<Event> listOfEvents) {
+  public String defineProblem(ArrayList<Event> listOfEvents, Map<String, Integer> assignments, Set<VariableSubstitution> substitutions) {
 
     Map<Event, Map<Attribute, String>> attributes = this.parseEvents(listOfEvents);
     List<State> finalAutomatonStates = new ArrayList<>();
 
     StringBuilder s = new StringBuilder();
     s.append(PDDLGenerator.HEADER_STRING);
-    s.append(this.buildObjectsString(attributes));
-    // s.append(this.buildSubstitutionValues());
+    s.append(this.buildObjectsString(attributes, assignments));
+
+    s.append(this.buildSubstitutionValues(assignments, substitutions));
     s.append(this.buildTraceDeclaration(listOfEvents, attributes));
     s.append(this.buildAutomatons(finalAutomatonStates));
+
     s.append(this.buildGoals());
     s.append(PDDLGenerator.FOOTER_STRING);
     return s.toString();
@@ -91,9 +93,8 @@ public class PDDLGenerator {
     Map<Event, Map<Attribute, String>> assignments = new HashMap<>();
     for(Event event : events) {
       event.setName("t" + index++); // Assign event name that will be put in the PDDL.
-      if (index == 1) {
-        State finalTraceState = new State();
-        finalTraceState.name = event.getName();
+      if (index == events.size()) { // If last element
+        State finalTraceState = new State(event.getName());
         this.goalStates.add(List.of(finalTraceState));
       }
       assignments.put(event, event.getAttributeAssignments());
@@ -101,7 +102,7 @@ public class PDDLGenerator {
     return assignments;
   }
 
-  private StringBuilder buildObjectsString(Map<Event, Map<Attribute, String>> attributeAssignments) {
+  private StringBuilder buildObjectsString(Map<Event, Map<Attribute, String>> attributeAssignments, Map<String, Integer> variables) {
     StringBuilder b = new StringBuilder();
     b.append("  (:objects\n");
 
@@ -115,12 +116,12 @@ public class PDDLGenerator {
     int index = 1;
     for (DeclareConstraint constraint : this.constraints) {
       String prefix = "s" + index++ + "_";
-      Automaton newAutomaton = new Automaton(prefix, constraint);
+      Automaton newAutomaton = new Automaton(activities.keySet(), prefix, constraint);
       this.constraintAutomatons.add(newAutomaton);
       
       // Automaton might have more than one goal state. In that case, we'll put the goal states with an "or" between them.
       List<State> goalStates = newAutomaton.getStates().stream()
-                                  .filter(x -> x.isFinal)
+                                  .filter(x -> x.isGoal)
                                   .toList();
 
       this.goalStates.add(goalStates);
@@ -149,17 +150,34 @@ public class PDDLGenerator {
     b.append("- parameter_name\n");
 
     // TODO Substitution values
-    // b.append("    ");
-    // this.activities.keySet().forEach(x -> b.append(x + " "));
-    // b.append("- activity");
+    b.append("    ");
+    variables.keySet().forEach(x -> b.append(x + " "));
+    b.append("- value_name\n");
 
     b.append("  )\n");
     return b;
   }
+
+  private StringBuilder buildSubstitutionValues(Map<String, Integer> variables, Set<VariableSubstitution> substitutions) {
+    StringBuilder b = new StringBuilder();
+
+    b.append("  (:init\n");
+    b.append("    ;; SUBSTITUTION VARIABLES\n");
+
+    for (Map.Entry<String, Integer> entry : variables.entrySet()) {
+      b.append("    (= (variable_value " + entry.getKey() + ") " + entry.getValue() + ")\n");
+    }
+    b.append("\n");
+    for (VariableSubstitution sub : substitutions) {
+      b.append("    (has_substitution_value " + sub.variableName + " " + sub.activityName + " " + sub.categoryName + ")\n");
+    }
+    b.append("\n");
+
+    return b;
+  }
   private StringBuilder buildTraceDeclaration(List<Event> events, Map<Event, Map<Attribute, String>> assignments) {
     StringBuilder b = new StringBuilder();
-    b.append("  ;; TRACE DECLARATION\n");
-    b.append("  (:init\n");
+    b.append("    ;; TRACE DECLARATION\n");
 
     b.append("    (cur_state " + events.get(0).getName() + ")\n");
     Iterator<Event> it1 = events.iterator();
@@ -185,8 +203,8 @@ public class PDDLGenerator {
 
         b.append("    (has_parameter " + activity + " " + singleAssignment.getKey().getName() + " " + cur.getName() + " " + next.getName() + ")\n");
         b.append("    (= (trace_parameter " + activity + " " + singleAssignment.getKey().getName() + " " + cur.getName() + " " + next.getName() + ") " + value + ")\n");
-        b.append("\n");
       }
+      b.append("\n");
     }
 
     return b;
@@ -196,43 +214,59 @@ public class PDDLGenerator {
     StringBuilder b = new StringBuilder();
     b.append("    ;; AUTOMATON STATES\n");
 
-    int index = 1; // Indicates number of automaton
     for (Automaton aut : this.constraintAutomatons) {
       
       for (State state : aut.getStates()) {
         if (state.isInitial) {
-          b.append("    (cur_state " + "s" + index + "_" + state.name + ")\n");
+          b.append("    (cur_state " + state.name + ")\n");
         }
         if (state.isFailure) {
-          b.append("    (failure_state " + "s" + index + "_" + state.name + ")\n");
+          b.append("    (failure_state " + state.name + ")\n");
         }
       }
 
       for (Transition t : aut.getTransitions()) {
-        b.append("    (automaton " + "s" + index + "_" + t.getActiviationState().name + " " + 
-            t.getActivity() + " " + 
-            "s" + index + "_" + t.getTargetState().name + ")\n");
+        b.append("    (automaton " + t.getActiviationState().name + " " + t.getActivity() + " " + t.getTargetState().name + ")\n");
 
         List<Condition> conditions = t.getReformedConditions();
-        for (Condition c : conditions) {
-          b.append(this.getConditionString(c));
+        if (conditions != null) {
+          for (Condition c : conditions) {
+            b.append(this.getConditionString(t, c));
+          }
         }
       }
     
       b.append("\n");
-      index++;
     }
 
     // Close init
     b.append("  )\n");
     return b;
   }
-  private StringBuilder getConditionString(Condition c) {
+  private StringBuilder getConditionString(Transition t, Condition c) {
     StringBuilder b = new StringBuilder();
 
-    // TODO
-    // Automaton will alreeady have all the conditions in place. Simple print formatted conditions out
+    switch (c.operator) {
+      case BIGGER_OR_EQUAL:
+        b.append("    (has_maj_c " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ")\n");
+        b.append("    (= (majority_constraint " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ") " + c.value + ")\n");
+        break;
+      case LESS_OR_EQUAL:
+        b.append("    (has_min_c " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ")\n");
+        b.append("    (= (minority_constraint " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ") " + c.value + ")\n");
+        break;
+      case EQUAL:
+        b.append("    (has_eq_c " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ")\n");
+        b.append("    (= (equality_constraint " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ") " + c.value + ")\n");
+        break;
+      case NOT_EQUAL:
+        b.append("    (has_ineq_c " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ")\n");
+        b.append("    (= (inequality_constraint " + c.activity + " " + c.parameterName + " " + t.getActiviationState().name + " " + t.getTargetState().name + ") " + c.value + ")\n");
+        break;
 
+      default:
+        break;
+    }
 
     return b;
   }
@@ -259,7 +293,7 @@ public class PDDLGenerator {
             "    (not (after_change))\n" + //
             "    (not (after_add))\n" + //
             "    (not (after_sync))\n" + //
-            "  )\n\n"
+            "  ))\n\n"
     );
     return b;
   }

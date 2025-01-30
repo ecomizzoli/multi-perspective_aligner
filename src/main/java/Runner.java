@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
+import Automaton.VariableSubstitution;
 import log.LogFile;
 import model.DeclareModel;
-import translations.DeclareToLTL;
 import translations.IOManager;
 import translations.PDDLGenerator;
 
@@ -20,13 +22,13 @@ public class Runner {
     DeclareModel model = ioManager.readDeclareModel("prob2decl.decl"); // OKAY!
     model.assignCosts(ioManager.readCostModel("costModel.txt")); // OKAY!
 
+    Map<String, Integer> variableAssignments = ioManager.readVariableAssignments("variable_values.txt");
+    Set<VariableSubstitution> substitutions = ioManager.readVariablesSubstitutions("variable_substitutions.txt");
+
     System.out.println("Model: " + model);
 
-    LogFile log = ioManager.readLog("prob2log.xes", model); // OKAY!
-
-    // System.out.println("Log: " + log);
-
-    // System.out.println("Model: " + model);
+    String fileName = "50events.xml";
+    LogFile log = ioManager.readLog(fileName, model); // OKAY!
     
     ioManager.exportModel(model);
 
@@ -34,12 +36,11 @@ public class Runner {
     // PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
     PDDLGenerator pddlGenerator = new PDDLGenerator(model);
     String domain = pddlGenerator.defineDomain();
-    ArrayList<String> problems = log.generateProblems(pddlGenerator);
+    ArrayList<String> problems = log.generateProblems(pddlGenerator, variableAssignments, substitutions);
     int i = 1;
     for (String problem : problems) {
       IOManager.getInstance().exportProblemPDDL(problem, i);
       i++;
-      break; // TODO Remove
     }
     IOManager.getInstance().exportDomainPDDL(domain);
   }

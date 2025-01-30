@@ -1,0 +1,5 @@
+a1_a a1 integer
+a2_a a2 categorical
+a2_b a2 categorical
+a2_c a2 categorical
+a2_b a4 categorical

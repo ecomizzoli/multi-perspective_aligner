@@ -1,6 +1,7 @@
 package Automaton;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import model.Condition;
@@ -10,38 +11,89 @@ import model.OperatorType;
 public class Automaton {
   
   private final String STATE_PREFIX;
-  private List<State> states;
-  private List<Transition> transitions;
+  private final Collection<String> ACTIVITY_NAMES;
+  private List<State> states = new ArrayList<>();
+  private List<Transition> transitions = new ArrayList<>();
 
-  public Automaton(String statePrefix, DeclareConstraint constraint) {
-    
-    // Do stuff with given constraint that creates states and transitions.
+  public Automaton(Collection<String> activityNames, String statePrefix, DeclareConstraint constraint) {
+    this.ACTIVITY_NAMES = activityNames;
     this.STATE_PREFIX = statePrefix;
+    
+    State s1 = new State(this.STATE_PREFIX + 1)
+      .initial();
 
-    // TODO Temp. Essentially an absence
-    int index = 1;
-    State s1 = new State();
-    s1.isInitial = true;
-    s1.isFinal = true;
-    s1.name = this.STATE_PREFIX + index;
-    index++;
+    State s2 = new State(this.STATE_PREFIX + 2);
 
-    State s2 = new State();
-    s2.isFailure = true;
-    s2.name = this.STATE_PREFIX + index;
-    index++;
+    State s3 = new State(this.STATE_PREFIX + 3);
 
-    List<Condition> conditions = new ArrayList<>();
-    // How do you get the condition for the activation?
-    conditions.add(new Condition("a1", "int", OperatorType.BIGGER_OR_EQUAL, Double.valueOf(30)));
-    Transition t = new Transition(s1, s2, constraint.getActivation(), conditions);
+    this.states.add(s1);
+    this.states.add(s2);
+    this.states.add(s3);
 
-    states = new ArrayList<>();
-    states.add(s1);
-    states.add(s2);
+    Transition t1;
+    Transition t2;
+    switch (constraint.getTemplate()) {
+      case Absence:
+        t1 = new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions());
+        this.transitions.add(t1);
+        s1.goal().failure();
+        break;
 
-    transitions = new ArrayList<>();
-    transitions.add(t);
+      case Existence:
+        t1 = new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions());
+        this.transitions.add(t1);
+        s2.goal();
+        break;
+
+      case Response:
+        t1 = new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions());
+        t2 = new Transition(s2, s1, constraint.getTarget(), constraint.getTargetConditions());
+        this.transitions.add(t1);
+        this.transitions.add(t2);
+
+        s1.goal();
+        break;
+
+      case Chain_Response:
+        t1 = new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions());
+        t2 = new Transition(s2, s1, constraint.getTarget(), constraint.getTargetConditions());
+        this.transitions.add(t1);
+        this.transitions.add(t2);
+        s1.goal();
+        s3.failure();
+
+        // Opposite of target condition brings the automaton to another state.
+        List<Condition> oppositeConditions = this.getOppositeConditions(constraint.getTargetConditions());
+        this.transitions.add(new Transition(s2, s3, constraint.getTarget(), oppositeConditions));
+
+        // All other activities of target brings the automaton to another state.
+        this.ACTIVITY_NAMES.forEach(x -> {
+          this.transitions.add(new Transition(s2, s3, x, null));
+        });
+        break;
+
+      case Exclusive_Choice:
+        State s4 = new State(this.STATE_PREFIX + 4).failure();
+        this.states.add(s4);
+        s2.goal();
+        s3.goal();
+        this.transitions.add( new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions()) );
+        this.transitions.add( new Transition(s1, s3, constraint.getTarget(), constraint.getTargetConditions()) );
+        this.transitions.add( new Transition(s2, s4, constraint.getActivation(), constraint.getActivationConditions()) );
+        this.transitions.add( new Transition(s3, s4, constraint.getTarget(), constraint.getTargetConditions()) );
+        break;
+
+      default:
+        break;
+    }
+  }
+  private List<Condition> getOppositeConditions(List<Condition> conditionsToNegate) {
+    List<Condition> negatedConditions = new ArrayList<>();
+
+    for (Condition c : conditionsToNegate) {
+      negatedConditions.add(new Condition(c.activity, c.parameterName, c.getNegatedCondition(), c.value));
+    }
+    return negatedConditions;
   }
 
   public List<State> getStates() {
