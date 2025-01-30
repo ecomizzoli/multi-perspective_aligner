@@ -67,6 +67,22 @@ public class PDDLGenerator {
     this.constraints = model.getDeclareConstraints();
     this.constraintAutomatons = new ArrayList<>();
     this.goalStates = new ArrayList<>();
+    this.prepareAutomatonStates();
+  }
+  private void prepareAutomatonStates() {
+    int index = 1;
+    for (DeclareConstraint constraint : this.constraints) {
+      String prefix = "s" + index++ + "_";
+      Automaton newAutomaton = new Automaton(activities.keySet(), prefix, constraint);
+      this.constraintAutomatons.add(newAutomaton);
+      
+      // Automaton might have more than one goal state. In that case, we'll put the goal states with an "or" between them.
+      List<State> goalStates = newAutomaton.getStates().stream()
+                                  .filter(x -> x.isGoal)
+                                  .toList();
+
+      this.goalStates.add(goalStates);
+    }
   }
 
   public String defineProblem(ArrayList<Event> listOfEvents, Map<String, Integer> assignments, Set<VariableSubstitution> substitutions) {
@@ -113,19 +129,6 @@ public class PDDLGenerator {
 
 
     // AUTOMATON STATES
-    int index = 1;
-    for (DeclareConstraint constraint : this.constraints) {
-      String prefix = "s" + index++ + "_";
-      Automaton newAutomaton = new Automaton(activities.keySet(), prefix, constraint);
-      this.constraintAutomatons.add(newAutomaton);
-      
-      // Automaton might have more than one goal state. In that case, we'll put the goal states with an "or" between them.
-      List<State> goalStates = newAutomaton.getStates().stream()
-                                  .filter(x -> x.isGoal)
-                                  .toList();
-
-      this.goalStates.add(goalStates);
-    }
     b.append("    ");
     this.constraintAutomatons.forEach(x -> {
       x.getStates().forEach(y -> {

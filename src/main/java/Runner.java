@@ -27,7 +27,7 @@ public class Runner {
 
     System.out.println("Model: " + model);
 
-    String fileName = "50events.xml";
+    String fileName = "50events.xes";
     LogFile log = ioManager.readLog(fileName, model); // OKAY!
     
     ioManager.exportModel(model);

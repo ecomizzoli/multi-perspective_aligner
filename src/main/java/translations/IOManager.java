@@ -63,6 +63,8 @@ public class IOManager {
       while (scanner.hasNextLine()) {
 
         String line = scanner.nextLine();
+        if (line.isEmpty()) continue;
+
         String[] read = line.split(" ");
         if (read.length != 2) {
           throw new Error("Parsing error!");
@@ -84,6 +86,8 @@ public class IOManager {
       while (scanner.hasNextLine()) {
 
         String line = scanner.nextLine();
+        if (line.isEmpty()) continue;
+
         String[] read = line.split(" ");
         if (read.length != 3) {
           throw new Error("Parsing error!");
