@@ -234,7 +234,7 @@
     )
     :effect (and 
       (after_change)
-      (increase (total_cost) 0.5)
+      (increase (total_cost) 1)
       (has_parameter ?a ?pn ?t1 ?t2)
       (assign (trace_parameter ?a ?pn ?t1 ?t2) (variable_value ?vn))
   ))
@@ -251,7 +251,7 @@
       (not (after_add))
     )
     :effect (and 
-      (increase (total_cost) 1.0)
+      (increase (total_cost) 2)
       (adding_value ?a ?t1)
       (after_add)
   ))
@@ -268,7 +268,7 @@
       (has_substitution_value ?vn ?a ?pn)
     )
     :effect (and 
-      (increase (total_cost) 0.5)
+      (increase (total_cost) 1)
       (has_added_parameter ?a ?pn ?t1)
       (assign (added_parameter ?a ?pn ?t1) (variable_value ?vn))
   ))
@@ -377,7 +377,7 @@
       (not (after_add))
     )
     :effect (and 
-      (increase (total_cost) 1.0)
+      (increase (total_cost) 2)
       (not (cur_state ?t1)) 
       (cur_state ?t2))
   )

@@ -6,7 +6,7 @@ public class DeclareModel {
   
   private final HashMap<String, Activity> activities;
   private final ArrayList<DeclareConstraint> declareConstraints;
-  private Map<CostEnum, Double> costs;
+  private Map<CostEnum, Integer> costs;
   
   public DeclareModel(Map<String, ArrayList<String[]>> parsedLines) {
     this.activities = addActivities(parsedLines.get("activityLines")); // ok
@@ -59,10 +59,10 @@ public class DeclareModel {
    * @param costs
    */
   public void assignCosts(String[] costs) {
-    Double[] costsDouble = new Double[4];
+    Integer[] costsDouble = new Integer[4];
 
     for (int i = 0; i < costs.length; i++) {
-      costsDouble[i] = Double.valueOf(costs[i]);
+      costsDouble[i] = Integer.valueOf(costs[i]);
     }
 
     this.costs = new HashMap<>();
@@ -211,7 +211,7 @@ public class DeclareModel {
   }
 
   // Costs
-  public Map<CostEnum, Double> getCosts() {
+  public Map<CostEnum, Integer> getCosts() {
     return this.costs;
   }
 }

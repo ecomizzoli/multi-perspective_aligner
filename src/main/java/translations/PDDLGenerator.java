@@ -24,18 +24,19 @@ import java.util.stream.Collectors;
 
 public class PDDLGenerator {
 
-  private static final double CHANGE_DEFAULT_COST = 0.5;
-  private static final double ADD_DEFAULT_COST = 1;
-  private static final double SET_DEFAULT_COST = 0.5;
-  private static final double DELETE_DEFAULT_COST = 1;
+  private static final int CHANGE_DEFAULT_COST = 1;
+  private static final int ADD_DEFAULT_COST = 2;
+  private static final int SET_DEFAULT_COST = 1;
+  private static final int DELETE_DEFAULT_COST = 2;
 
-  private final Map<CostEnum, Double> costs;
+  private final Map<CostEnum, Integer> costs;
   
   // NOTE Define action costs above ^^^
   private final HashMap<String, Activity> activities;
   private final ArrayList<DeclareConstraint> constraints;
   private ArrayList<Automaton> constraintAutomatons;
-  private List<List<State>> goalStates;
+  private List<List<State>> goalAutomatonStates;
+  private State finalTraceState;
   // private final ArrayList<Transition> relevantTransitions;
 
   private static final String HEADER_STRING = 
@@ -50,7 +51,7 @@ public class PDDLGenerator {
   public PDDLGenerator(DeclareModel model) throws Exception {
 
     // Get set costs, or use default ones
-    Map<CostEnum, Double> costs = model.getCosts();
+    Map<CostEnum, Integer> costs = model.getCosts();
     if (costs != null) {
       this.costs = costs;
     } else {
@@ -66,7 +67,7 @@ public class PDDLGenerator {
     this.activities = model.getActivities();
     this.constraints = model.getDeclareConstraints();
     this.constraintAutomatons = new ArrayList<>();
-    this.goalStates = new ArrayList<>();
+    this.goalAutomatonStates = new ArrayList<>();
     this.prepareAutomatonStates();
   }
   private void prepareAutomatonStates() {
@@ -81,7 +82,7 @@ public class PDDLGenerator {
                                   .filter(x -> x.isGoal)
                                   .toList();
 
-      this.goalStates.add(goalStates);
+      this.goalAutomatonStates.add(goalStates);
     }
   }
 
@@ -111,7 +112,7 @@ public class PDDLGenerator {
       event.setName("t" + index++); // Assign event name that will be put in the PDDL.
       if (index == events.size()) { // If last element
         State finalTraceState = new State(event.getName());
-        this.goalStates.add(List.of(finalTraceState));
+        this.finalTraceState = finalTraceState;
       }
       assignments.put(event, event.getAttributeAssignments());
     }
@@ -279,7 +280,8 @@ public class PDDLGenerator {
     b.append("  ;; GOAL STATES\n");
     b.append("  (:goal (and\n");
 
-    for (List<State> goalStates : this.goalStates) {
+    b.append("    (cur_state " + this.finalTraceState.name + ")\n");
+    for (List<State> goalStates : this.goalAutomatonStates) {
       if (goalStates.size() == 1) {
         b.append("    (cur_state " + goalStates.get(0).name + ")\n");
       } else { // In case two or more
