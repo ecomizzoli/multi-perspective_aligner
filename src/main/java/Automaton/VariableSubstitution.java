@@ -2,7 +2,6 @@ package Automaton;
 
 public class VariableSubstitution {
   public String variableName;
-  public String activityName;
   public String categoryName;
 
   @Override
@@ -11,7 +10,6 @@ public class VariableSubstitution {
 
     VariableSubstitution that = (VariableSubstitution) o;
     if (!this.variableName.equals(that.variableName)) return false;
-    if (!this.activityName.equals(that.activityName)) return false;
     if (!this.categoryName.equals(that.categoryName)) return false;
 
     return true;

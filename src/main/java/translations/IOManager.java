@@ -89,14 +89,13 @@ public class IOManager {
         if (line.isEmpty()) continue;
 
         String[] read = line.split(" ");
-        if (read.length != 3) {
+        if (read.length != 2) {
           throw new Error("Parsing error!");
         }
 
         VariableSubstitution va = new VariableSubstitution();
         va.variableName = read[0];
-        va.activityName = read[1];
-        va.categoryName = read[2];
+        va.categoryName = read[1];
 
         set.add(va);
       }

@@ -173,7 +173,7 @@ public class PDDLGenerator {
     }
     b.append("\n");
     for (VariableSubstitution sub : substitutions) {
-      b.append("    (has_substitution_value " + sub.variableName + " " + sub.activityName + " " + sub.categoryName + ")\n");
+      b.append("    (has_substitution_value " + sub.variableName + " " + sub.categoryName + ")\n");
     }
     b.append("\n");
 
@@ -183,7 +183,7 @@ public class PDDLGenerator {
     StringBuilder b = new StringBuilder();
     b.append("    ;; TRACE DECLARATION\n");
 
-    b.append("    (cur_state " + events.get(0).getName() + ")\n");
+    b.append("    (cur_t_state " + events.get(0).getName() + ")\n");
     Iterator<Event> it1 = events.iterator();
     Event cur;
 
@@ -222,7 +222,7 @@ public class PDDLGenerator {
       
       for (State state : aut.getStates()) {
         if (state.isInitial) {
-          b.append("    (cur_state " + state.name + ")\n");
+          b.append("    (cur_s_state " + state.name + ")\n");
         }
         if (state.isFailure) {
           b.append("    (failure_state " + state.name + ")\n");
@@ -280,15 +280,15 @@ public class PDDLGenerator {
     b.append("  ;; GOAL STATES\n");
     b.append("  (:goal (and\n");
 
-    b.append("    (cur_state " + this.finalTraceState.name + ")\n");
+    b.append("    (cur_t_state " + this.finalTraceState.name + ")\n");
     for (List<State> goalStates : this.goalAutomatonStates) {
       if (goalStates.size() == 1) {
-        b.append("    (cur_state " + goalStates.get(0).name + ")\n");
+        b.append("    (cur_s_state " + goalStates.get(0).name + ")\n");
       } else { // In case two or more
 
         b.append("    (or\n");
         for (State singleGoal : goalStates) {
-          b.append("      (cur_state " + singleGoal.name + ")\n");
+          b.append("      (cur_s_state " + singleGoal.name + ")\n");
         }
         b.append("    )\n");
       }
@@ -306,7 +306,7 @@ public class PDDLGenerator {
   public String defineDomain() {
     return "(define (domain trace-alignment)\n" + //
         "\n" + //
-        "  (:requirements :strips :typing :equality :adl :fluents :action-costs)\n" + //
+        "  (:requirements :strips :typing :equality :fluents :action-costs)\n" + //
         "\n" + //
         "  (:types activity automaton_state trace_state parameter_name value_name)\n" + //
         "\n" + //
@@ -339,8 +339,8 @@ public class PDDLGenerator {
         "    ;; TRACES AND AUTOMATONS\n" + //
         "    (trace ?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
         "    (automaton ?s1 - automaton_state ?a - activity ?s2 - automaton_state)\n" + //
-        "    (cur_state ?t - trace_state)\n" + //
-        "    (cur_state ?s - automaton_state)\n" + //
+        "    (cur_t_state ?t - trace_state)\n" + //
+        "    (cur_s_state ?s - automaton_state)\n" + //
         "\n" + //
         "    ;; PARAMETER AND CONSTRAINT DECLARATION\n" + //
         "    (has_parameter ?a - activity ?pn - parameter_name ?t1 - trace_state ?t2 - trace_state)\n" + //
@@ -358,7 +358,7 @@ public class PDDLGenerator {
         "    (after_add)\n" + //
         "\n" + //
         "    ; Declare this to indicate that such activity-parameter-value assignment exists.\n" + //
-        "    (has_substitution_value ?vn - variable_name ?a - activity ?pn - parameter_name)\n" + //
+        "    (has_substitution_value ?vn - value_name ?pn - parameter_name)\n" + //
         "    ; Indicates that the new activity has a new (defined) parameter.\n" + //
         "    (has_added_parameter ?a - activity ?par - parameter_name ?t1 - trace_state)\n" + //
         "\n" + //
@@ -391,15 +391,15 @@ public class PDDLGenerator {
         "  (:action sync\n" + //
         "    :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
         "    :precondition (and \n" + //
-        "      (cur_state ?t1) \n" + //
+        "      (cur_t_state ?t1) \n" + //
         "      (trace ?t1 ?a ?t2) \n" + //
         "      (not (after_sync))\n" + //
         "      (not (after_add))\n" + //
         "      (not (failure)))\n" + //
         "    :effect (and \n" + //
         "      (increase (total_cost) 0)\n" + //
-        "      (not (cur_state ?t1)) \n" + //
-        "      (cur_state ?t2)\n" + //
+        "      (not (cur_t_state ?t1)) \n" + //
+        "      (cur_t_state ?t2)\n" + //
         "      (not (after_change))\n" + //
         "      (after_sync)\n" + //
         "      (complete_sync ?a)\n" + //
@@ -497,22 +497,22 @@ public class PDDLGenerator {
         "        (when (and\n" + //
         "          (not (invalid ?s1 ?a ?s2))\n" + //
         "          (automaton ?s1 ?a ?s2)\n" + //
-        "          (cur_state ?s1)\n" + //
+        "          (cur_s_state ?s1)\n" + //
         "          (not (failure_state ?s2))\n" + //
         "        ) (and\n" + //
-        "          (not (cur_state ?s1))\n" + //
-        "          (cur_state ?s2)\n" + //
+        "          (not (cur_s_state ?s1))\n" + //
+        "          (cur_s_state ?s2)\n" + //
         "        ))\n" + //
         "      )\n" + //
         "      (forall (?s1 - automaton_state ?s2 - automaton_state)\n" + //
         "        (when (and\n" + //
         "          (not (invalid ?s1 ?a ?s2))\n" + //
         "          (automaton ?s1 ?a ?s2)\n" + //
-        "          (cur_state ?s1)\n" + //
+        "          (cur_s_state ?s1)\n" + //
         "          (failure_state ?s2)\n" + //
         "        ) (and\n" + //
-        "          (not (cur_state ?s1))\n" + //
-        "          (cur_state ?s2)\n" + //
+        "          (not (cur_s_state ?s1))\n" + //
+        "          (cur_s_state ?s2)\n" + //
         "          (failure)\n" + //
         "        ))\n" + //
         "      )\n" + //
@@ -530,11 +530,11 @@ public class PDDLGenerator {
         "    :parameters (?a - activity ?t1 - trace_state ?t2 - trace_state ?pn - parameter_name ?vn - value_name)\n" + //
         "    :precondition (and \n" + //
         "      (trace ?t1 ?a ?t2)\n" + //
-        "      (cur_state ?t1)\n" + //
+        "      (cur_t_state ?t1)\n" + //
         "      (not (failure))\n" + //
         "      (not (after_sync))\n" + //
         "      (not (after_add))\n" + //
-        "      (has_substitution_value ?vn ?a ?pn)\n" + //
+        "      (has_substitution_value ?vn ?pn)\n" + //
         "      ; TODO Check this:\n" + //
         "      (has_parameter ?a ?pn ?t1 ?t2)\n" + //
         "    )\n" + //
@@ -550,7 +550,7 @@ public class PDDLGenerator {
         "  (:action add\n" + //
         "    :parameters (?a - activity ?t1 - trace_state)\n" + //
         "    :precondition (and \n" + //
-        "      (cur_state ?t1) \n" + //
+        "      (cur_t_state ?t1) \n" + //
         "      (not (after_change))\n" + //
         "      (not (after_sync))\n" + //
         "      (not (failure))\n" + //
@@ -566,12 +566,12 @@ public class PDDLGenerator {
         "    :parameters (?a - activity ?t1 - trace_state ?pn - parameter_name ?vn - value_name)\n" + //
         "    :precondition (and \n" + //
         "      (adding_value ?a ?t1)\n" + //
-        "      (cur_state ?t1)\n" + //
+        "      (cur_t_state ?t1)\n" + //
         "      (not (failure))\n" + //
         "      (not (after_change))\n" + //
         "      (not (after_sync))\n" + //
         "      (after_add)\n" + //
-        "      (has_substitution_value ?vn ?a ?pn)\n" + //
+        "      (has_substitution_value ?vn ?pn)\n" + //
         "    )\n" + //
         "    :effect (and \n" + //
         "      (increase (total_cost) " + this.costs.get(CostEnum.SET) + ")\n" + //
@@ -583,7 +583,7 @@ public class PDDLGenerator {
         "    :parameters (?a - activity ?t1 - trace_state)\n" + //
         "    :precondition (and \n" + //
         "      (adding_value ?a ?t1)\n" + //
-        "      (cur_state ?t1)\n" + //
+        "      (cur_t_state ?t1)\n" + //
         "      (not (failure))\n" + //
         "      (not (after_change))\n" + //
         "      (not (after_sync))\n" + //
@@ -675,7 +675,7 @@ public class PDDLGenerator {
         "  (:action del\n" + //
         "    :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)\n" + //
         "    :precondition (and \n" + //
-        "      (cur_state ?t1) \n" + //
+        "      (cur_t_state ?t1) \n" + //
         "      (trace ?t1 ?a ?t2) \n" + //
         "      (not (after_change))\n" + //
         "      (not (after_sync))\n" + //
@@ -684,8 +684,8 @@ public class PDDLGenerator {
         "    )\n" + //
         "    :effect (and \n" + //
         "      (increase (total_cost) " + this.costs.get(CostEnum.DELETE) + ")\n" + //
-        "      (not (cur_state ?t1)) \n" + //
-        "      (cur_state ?t2))\n" + //
+        "      (not (cur_t_state ?t1)) \n" + //
+        "      (cur_t_state ?t2))\n" + //
         "  )\n" + //
         ")\n" + //
         "";
