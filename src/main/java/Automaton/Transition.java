@@ -27,9 +27,10 @@ public class Transition {
     List<Condition> newList = new ArrayList<>();
     for (Condition condition : conditions) {
       
-      // BIGGER OR LESS NEED TWO CONDITIONS IN PDDL
+      // BIGGER OR LESS NEED TWO CONDITIONS IN OUR PDDL
       switch (condition.operator) {
         case BIGGER:
+          // > is equal to >= && !=
           newList.add(new Condition(condition.activity, condition.parameterName, OperatorType.BIGGER_OR_EQUAL, condition.value));
           newList.add(new Condition(condition.activity, condition.parameterName, OperatorType.NOT_EQUAL, condition.value));
           break;

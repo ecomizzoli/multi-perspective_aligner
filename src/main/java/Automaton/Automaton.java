@@ -6,7 +6,6 @@ import java.util.List;
 
 import model.Condition;
 import model.DeclareConstraint;
-import model.OperatorType;
 
 public class Automaton {
   

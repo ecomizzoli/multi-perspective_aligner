@@ -44,28 +44,6 @@ public class LogFile {
     return problems;
   }
   
-  public void repairTraces(ArrayList<String> alignments, Map<String, Activity> activityMap) {
-    for (int i = 0; i < traces.size(); i++) {
-      traces.get(i).repairTrace(alignments.get(i), activityMap);
-    }
-  }
-  
-  public ArrayList<XTrace> buildOriginalXTraces() {
-    ArrayList<XTrace> originalXTraces = new ArrayList<>();
-    for (Trace trace : traces) {
-      trace.buildOriginalXTrace();
-    }
-    return originalXTraces;
-  }
-  
-  public ArrayList<XTrace> buildRepairedXTraces() {
-    ArrayList<XTrace> originalXTraces = new ArrayList<>();
-    for (Trace trace : traces) {
-      trace.buildRepairedXTrace();
-    }
-    return originalXTraces;
-  }
-  
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder("This log contains " + traces.size() + " traces:\n");

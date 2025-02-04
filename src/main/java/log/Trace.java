@@ -2,8 +2,6 @@ package log;
 
 import model.Activity;
 import org.deckfour.xes.extension.std.XConceptExtension;
-import org.deckfour.xes.factory.XFactoryNaiveImpl;
-import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 import java.util.*;
@@ -47,14 +45,5 @@ public class Trace {
     // }
     // builder.append(getSequence("repaired")).append("\n");
     return builder.toString();
-  }
-  
-  public XTrace buildOriginalXTrace() {
-    XFactoryNaiveImpl factory = new XFactoryNaiveImpl();
-    XTrace originalXTrace = factory.createTrace();
-    for (Event event : originalEventsList) {
-      originalXTrace.add(event.getxEvent());
-    }
-    return originalXTrace;
   }
 }
