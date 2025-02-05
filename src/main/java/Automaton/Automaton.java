@@ -35,7 +35,8 @@ public class Automaton {
       case Absence:
         t1 = new Transition(s1, s2, constraint.getActivation(), constraint.getActivationConditions());
         this.transitions.add(t1);
-        s1.goal().failure();
+        s1.goal();
+        s2.failure();
         break;
 
       case Existence:

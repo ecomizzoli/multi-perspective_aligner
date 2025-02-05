@@ -33,8 +33,8 @@
     ;; TRACES AND AUTOMATONS
     (trace ?t1 - trace_state ?a - activity ?t2 - trace_state)
     (automaton ?s1 - automaton_state ?a - activity ?s2 - automaton_state)
-    (cur_state ?t - trace_state)
-    (cur_state ?s - automaton_state)
+    (cur_t_state ?t - trace_state)
+    (cur_s_state ?s - automaton_state)
 
     ;; PARAMETER AND CONSTRAINT DECLARATION
     (has_parameter ?a - activity ?pn - parameter_name ?t1 - trace_state ?t2 - trace_state)
@@ -52,7 +52,7 @@
     (after_add)
 
     ; Declare this to indicate that such activity-parameter-value assignment exists.
-    (has_substitution_value ?vn - variable_name ?a - activity ?pn - parameter_name)
+    (has_substitution_value ?vn - value_name ?a - activity ?pn - parameter_name)
     ; Indicates that the new activity has a new (defined) parameter.
     (has_added_parameter ?a - activity ?par - parameter_name ?t1 - trace_state)
 
@@ -85,15 +85,15 @@
   (:action sync
     :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)
     :precondition (and 
-      (cur_state ?t1) 
+      (cur_t_state ?t1) 
       (trace ?t1 ?a ?t2) 
       (not (after_sync))
       (not (after_add))
       (not (failure)))
     :effect (and 
       (increase (total_cost) 0)
-      (not (cur_state ?t1)) 
-      (cur_state ?t2)
+      (not (cur_t_state ?t1)) 
+      (cur_t_state ?t2)
       (not (after_change))
       (after_sync)
       (complete_sync ?a)
@@ -191,22 +191,22 @@
         (when (and
           (not (invalid ?s1 ?a ?s2))
           (automaton ?s1 ?a ?s2)
-          (cur_state ?s1)
+          (cur_s_state ?s1)
           (not (failure_state ?s2))
         ) (and
-          (not (cur_state ?s1))
-          (cur_state ?s2)
+          (not (cur_s_state ?s1))
+          (cur_s_state ?s2)
         ))
       )
       (forall (?s1 - automaton_state ?s2 - automaton_state)
         (when (and
           (not (invalid ?s1 ?a ?s2))
           (automaton ?s1 ?a ?s2)
-          (cur_state ?s1)
+          (cur_s_state ?s1)
           (failure_state ?s2)
         ) (and
-          (not (cur_state ?s1))
-          (cur_state ?s2)
+          (not (cur_s_state ?s1))
+          (cur_s_state ?s2)
           (failure)
         ))
       )
@@ -224,7 +224,7 @@
     :parameters (?a - activity ?t1 - trace_state ?t2 - trace_state ?pn - parameter_name ?vn - value_name)
     :precondition (and 
       (trace ?t1 ?a ?t2)
-      (cur_state ?t1)
+      (cur_t_state ?t1)
       (not (failure))
       (not (after_sync))
       (not (after_add))
@@ -244,7 +244,7 @@
   (:action add
     :parameters (?a - activity ?t1 - trace_state)
     :precondition (and 
-      (cur_state ?t1) 
+      (cur_t_state ?t1) 
       (not (after_change))
       (not (after_sync))
       (not (failure))
@@ -260,7 +260,7 @@
     :parameters (?a - activity ?t1 - trace_state ?pn - parameter_name ?vn - value_name)
     :precondition (and 
       (adding_value ?a ?t1)
-      (cur_state ?t1)
+      (cur_t_state ?t1)
       (not (failure))
       (not (after_change))
       (not (after_sync))
@@ -277,7 +277,7 @@
     :parameters (?a - activity ?t1 - trace_state)
     :precondition (and 
       (adding_value ?a ?t1)
-      (cur_state ?t1)
+      (cur_t_state ?t1)
       (not (failure))
       (not (after_change))
       (not (after_sync))
@@ -369,7 +369,7 @@
   (:action del
     :parameters (?t1 - trace_state ?a - activity ?t2 - trace_state)
     :precondition (and 
-      (cur_state ?t1) 
+      (cur_t_state ?t1) 
       (trace ?t1 ?a ?t2) 
       (not (after_change))
       (not (after_sync))
@@ -378,7 +378,7 @@
     )
     :effect (and 
       (increase (total_cost) 2)
-      (not (cur_state ?t1)) 
-      (cur_state ?t2))
+      (not (cur_t_state ?t1)) 
+      (cur_t_state ?t2))
   )
 )

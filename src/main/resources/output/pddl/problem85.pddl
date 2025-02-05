@@ -9,6 +9,10 @@
     c3 v15 c1 v5 c2 - value_name
   )
   (:init
+
+    ; Leave below if you want to use Metric-FF, otherwise zero states are found. Bug?
+    (= (total_cost) 0)
+
     ;; SUBSTITUTION VARIABLES
     (= (variable_value c3) 3)
     (= (variable_value v15) 15)
@@ -68,7 +72,7 @@
     (has_substitution_value c3 a3 categorical)
 
     ;; TRACE DECLARATION
-    (cur_state t0)
+    (cur_t_state t0)
     (trace t0 a5 t1)
     (has_parameter a5 categorical t0 t1)
     (= (trace_parameter a5 categorical t0 t1) 3)
@@ -364,24 +368,24 @@
     (= (trace_parameter a4 integer t48 t49) 38)
 
     ;; AUTOMATON STATES
-    (cur_state s1_1)
+    (cur_s_state s1_1)
     (automaton s1_1 a5 s1_2)
     (has_eq_c a5 categorical s1_1 s1_2)
     (= (equality_constraint a5 categorical s1_1 s1_2) 3)
 
-    (cur_state s2_1)
+    (cur_s_state s2_1)
     (automaton s2_1 a10 s2_2)
     (has_eq_c a10 categorical s2_1 s2_2)
     (= (equality_constraint a10 categorical s2_1 s2_2) 3)
 
-    (cur_state s3_1)
+    (cur_s_state s3_1)
     (automaton s3_1 a7 s3_2)
     (has_maj_c a7 integer s3_1 s3_2)
     (= (majority_constraint a7 integer s3_1 s3_2) 10)
     (has_ineq_c a7 integer s3_1 s3_2)
     (= (inequality_constraint a7 integer s3_1 s3_2) 10)
 
-    (cur_state s4_1)
+    (cur_s_state s4_1)
     (automaton s4_1 a1 s4_2)
     (has_maj_c a1 integer s4_1 s4_2)
     (= (majority_constraint a1 integer s4_1 s4_2) 10)
@@ -393,7 +397,7 @@
     (has_ineq_c a2 integer s4_2 s4_1)
     (= (inequality_constraint a2 integer s4_2 s4_1) 10)
 
-    (cur_state s5_1)
+    (cur_s_state s5_1)
     (automaton s5_1 a3 s5_2)
     (has_eq_c a3 categorical s5_1 s5_2)
     (= (equality_constraint a3 categorical s5_1 s5_2) 1)
@@ -401,7 +405,7 @@
     (has_eq_c a4 categorical s5_2 s5_1)
     (= (equality_constraint a4 categorical s5_2 s5_1) 2)
 
-    (cur_state s6_1)
+    (cur_s_state s6_1)
     (automaton s6_1 a5 s6_2)
     (has_eq_c a5 categorical s6_1 s6_2)
     (= (equality_constraint a5 categorical s6_1 s6_2) 3)
@@ -411,7 +415,7 @@
     (has_ineq_c a7 integer s6_2 s6_1)
     (= (inequality_constraint a7 integer s6_2 s6_1) 10)
 
-    (cur_state s7_1)
+    (cur_s_state s7_1)
     (failure_state s7_3)
     (automaton s7_1 a6 s7_2)
     (has_maj_c a6 integer s7_1 s7_2)
@@ -437,7 +441,7 @@
     (automaton s7_2 a8 s7_3)
     (automaton s7_2 a9 s7_3)
 
-    (cur_state s8_1)
+    (cur_s_state s8_1)
     (failure_state s8_3)
     (automaton s8_1 a1 s8_2)
     (has_eq_c a1 categorical s8_1 s8_2)
@@ -459,7 +463,7 @@
     (automaton s8_2 a8 s8_3)
     (automaton s8_2 a9 s8_3)
 
-    (cur_state s9_1)
+    (cur_s_state s9_1)
     (automaton s9_1 a9 s9_2)
     (has_maj_c a9 integer s9_1 s9_2)
     (= (majority_constraint a9 integer s9_1 s9_2) 10)
@@ -471,7 +475,7 @@
     (has_ineq_c a10 integer s9_2 s9_1)
     (= (inequality_constraint a10 integer s9_2 s9_1) 10)
 
-    (cur_state s10_1)
+    (cur_s_state s10_1)
     (failure_state s10_4)
     (automaton s10_1 a8 s10_2)
     (has_eq_c a8 categorical s10_1 s10_2)
@@ -489,19 +493,19 @@
   )
   ;; GOAL STATES
   (:goal (and
-    (cur_state t49)
-    (cur_state s1_2)
-    (cur_state s2_2)
-    (cur_state s3_2)
-    (cur_state s4_1)
-    (cur_state s5_1)
-    (cur_state s6_1)
-    (cur_state s7_1)
-    (cur_state s8_1)
-    (cur_state s9_1)
+    (cur_t_state t49)
+    (cur_s_state s1_2)
+    (cur_s_state s2_2)
+    (cur_s_state s3_2)
+    (cur_s_state s4_1)
+    (cur_s_state s5_1)
+    (cur_s_state s6_1)
+    (cur_s_state s7_1)
+    (cur_s_state s8_1)
+    (cur_s_state s9_1)
     (or
-      (cur_state s10_2)
-      (cur_state s10_3)
+      (cur_s_state s10_2)
+      (cur_s_state s10_3)
     )
     (not (failure))
     (not (after_change))
