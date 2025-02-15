@@ -1,0 +1,32 @@
+activity a1
+bind a1: integer, categorical
+activity a2
+bind a2: integer, categorical
+activity a3
+bind a3: integer, categorical
+activity a4
+bind a4: integer, categorical
+activity a5
+bind a5: integer, categorical
+activity a6
+bind a6: integer, categorical
+activity a7
+bind a7: integer, categorical
+activity a8
+bind a8: integer, categorical
+activity a9
+bind a9: integer, categorical
+activity a10
+bind a10: integer, categorical
+integer: integer between 0 and 100
+categorical: c1, c2, c3
+Response[a1, a2] |A.integer > 10 |T.integer < 10 |
+Response[a3, a4] |A.categorical is c1 |T.categorical is c2 |
+Existence[a5] |A.categorical is c3 |
+Response[a5, a7] |A.categorical is c3 |T.integer > 10 |
+Chain Response[a6, a7] |A.integer > 10 |T.integer > 10 |
+Chain Response[a1, a4] |A.categorical is c1 |T.categorical is c2 |
+Existence[a10] |A.categorical is c3 |
+Response[a9, a10] |A.integer > 10 |T.integer > 10 |
+Exclusive Choice[a8, a5] |A.categorical is c1 |T.categorical is c3 |
+Existence[a7] |A.integer > 10 |
