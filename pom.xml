@@ -35,8 +35,8 @@
             <groupId>ltl2automaton</groupId>
             <artifactId>ltl2Automaton</artifactId>
             <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/lib/LTL2Automaton.jar</systemPath>
+            <!-- <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/LTL2Automaton.jar</systemPath> -->
         </dependency>
         <dependency>
             <groupId>com.github.vbmacher</groupId>

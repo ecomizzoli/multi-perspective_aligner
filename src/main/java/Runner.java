@@ -34,6 +34,7 @@ public class Runner {
 
     public static void findAlignments(String modelString, String trace, String costs) throws Exception {
         IOManager ioManager = IOManager.getInstance();
+        ioManager.setProjectPrefix("multi-perspective_aligner");
 
         DeclareModel model = ioManager.readDeclareModel(modelString);
         model.assignCosts(ioManager.readCostModel(costs));
@@ -49,6 +50,7 @@ public class Runner {
             PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
             String domain = pddlGenerator.defineDomain();
             ArrayList<String> problems = log.defineProblems(pddlGenerator);
+            System.out.println(problems.size());
             int i = 1;
             for (String problem : problems) {
                 IOManager.getInstance().exportProblemPDDL(problem, i);

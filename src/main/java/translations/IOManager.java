@@ -15,21 +15,36 @@ import java.util.regex.Pattern;
 
 public class IOManager {
 
-    private static IOManager ioManager;
-    private final String resourcesFolder = "src" + File.separator + "main" + File.separator + "resources" + File.separator;
-    private final String inputFolder = resourcesFolder + "input" + File.separator;
-    private final String outputFolder = resourcesFolder + "output" + File.separator;
-    private final String pddlFolder = outputFolder + "pddl" + File.separator;
-    //private String alignmentFolder = outputFolder + "alignments" + File.separator;
+  private static IOManager ioManager;
+  private String projectPrefix = "";
+  private String resourcesFolder;
+  private String inputFolder;
+  private String outputFolder;
+  private String pddlFolder;
+  //private String alignmentFolder = outputFolder + "alignments" + File.separator;
+  
+  private IOManager() {
+    this.setPaths();
+  }
 
-    private IOManager() {}
-
-    public static IOManager getInstance() {
-        if (ioManager == null) {
-            ioManager = new IOManager();
-        }
-        return ioManager;
+  public static IOManager getInstance() {
+    if (ioManager == null) {
+      ioManager = new IOManager();
     }
+    return ioManager;
+  }
+
+  private void setPaths() {
+    this.resourcesFolder = this.projectPrefix + "src" + File.separator + "main" + File.separator + "resources" + File.separator;
+    this.inputFolder = resourcesFolder + "input" + File.separator;
+    this.outputFolder = resourcesFolder + "output" + File.separator;
+    this.pddlFolder = outputFolder + "pddl" + File.separator;
+  }
+
+  public void setProjectPrefix(String projectPrefix) {
+    this.projectPrefix = projectPrefix + File.separator;
+    this.setPaths();
+  }
 
     //Section: Reading declare model
     public DeclareModel readDeclareModel(String modelFileName) {
