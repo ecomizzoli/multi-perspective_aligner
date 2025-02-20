@@ -41,6 +41,7 @@ public class Runner {
         LogFile log = ioManager.readLog(trace, model);
         //System.out.println(log);
 
+        System.out.println("Model: " + model);
 
         ioManager.exportModel(model);
         String ltlFormula = new DeclareToLTL(model).translateModelToLTL();
@@ -56,12 +57,15 @@ public class Runner {
                 IOManager.getInstance().exportProblemPDDL(problem, i);
                 i++;
             }
-            // Planner planner = new Planner(domain, problems);
+            System.out.println("Domain: " + domain);
+            System.out.println("Problems " + problems);
             IOManager.getInstance().exportDomainPDDL(domain);
-            // ArrayList<String> alignments = planner.readProblems();
-            // log.repairTraces(alignments, model.getActivities());
-            //ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
-            //ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
+
+            Planner planner = new Planner(domain, problems);
+            ArrayList<String> alignments = planner.readProblems();
+            log.repairTraces(alignments, model.getActivities());
+            // ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
+            // ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
             // IOManager.getInstance().exportLog(log);
         }
     }
