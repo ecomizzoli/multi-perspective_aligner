@@ -1,0 +1,40 @@
+digraph "MyAutomata" {
+	init [shape=none, label=""];
+	name [shape=note, label="MyAutomata"];
+	rankdir=LR;
+
+	s0 [shape=doublecircle];
+	s3 [shape=circle];
+	s1 [shape=circle];
+	s2 [shape=circle];
+
+	s0 -> s3 [label="a3_p2"];
+	s0 -> s3 [label="a3_p1"];
+	s0 -> s1 [label="a1_p9"];
+	s0 -> s1 [label="a1_p6"];
+	s0 -> s1 [label="a1_p3"];
+	s0 -> s3 [label="a3_p3"];
+	s0 -> s0 [label="!a1_p9&!a3_p2&!a3_p1&!a1_p3&!a3_p3&!a1_p6"];
+	s3 -> s2 [label="a1_p9"];
+	s3 -> s2 [label="a1_p6"];
+	s3 -> s2 [label="a1_p3"];
+	s3 -> s0 [label="a4_p6"];
+	s3 -> s0 [label="a4_p5"];
+	s3 -> s0 [label="a4_p4"];
+	s3 -> s3 [label="!a1_p9&!a1_p3&!a4_p4&!a4_p5&!a4_p6&!a1_p6"];
+	s1 -> s2 [label="a3_p2"];
+	s1 -> s0 [label="a2_p1"];
+	s1 -> s2 [label="a3_p1"];
+	s1 -> s0 [label="a2_p7"];
+	s1 -> s0 [label="a2_p4"];
+	s1 -> s2 [label="a3_p3"];
+	s1 -> s1 [label="!a3_p2&!a2_p1&!a3_p1&!a2_p4&!a3_p3&!a2_p7"];
+	s2 -> s3 [label="a2_p1"];
+	s2 -> s3 [label="a2_p7"];
+	s2 -> s1 [label="a4_p6"];
+	s2 -> s3 [label="a2_p4"];
+	s2 -> s1 [label="a4_p5"];
+	s2 -> s1 [label="a4_p4"];
+	s2 -> s2 [label="!a2_p1&!a2_p4&!a4_p4&!a4_p5&!a2_p7&!a4_p6"];
+	init -> s0;
+}
