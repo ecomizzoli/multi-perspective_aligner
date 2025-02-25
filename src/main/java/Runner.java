@@ -41,29 +41,31 @@ public class Runner {
         LogFile log = ioManager.readLog(trace, model);
         //System.out.println(log);
 
-        System.out.println("Model: " + model);
+        // System.out.println("Model: " + model);
 
         ioManager.exportModel(model);
         String ltlFormula = new DeclareToLTL(model).translateModelToLTL();
 
         if (!ltlFormula.isBlank()) {
-            System.out.println(ltlFormula);
+            // System.out.println(ltlFormula);
             PDDLGenerator pddlGenerator = new PDDLGenerator(model, ltlFormula);
             String domain = pddlGenerator.defineDomain();
             ArrayList<String> problems = log.defineProblems(pddlGenerator);
-            System.out.println(problems.size());
+            // System.out.println(problems.size());
             int i = 1;
             for (String problem : problems) {
                 IOManager.getInstance().exportProblemPDDL(problem, i);
                 i++;
             }
-            System.out.println("Domain: " + domain);
-            System.out.println("Problems " + problems);
+            // System.out.println("Domain: " + domain);
+            // System.out.println("Problems " + problems);
             IOManager.getInstance().exportDomainPDDL(domain);
 
-            Planner planner = new Planner(domain, problems);
-            ArrayList<String> alignments = planner.readProblems();
-            log.repairTraces(alignments, model.getActivities());
+            // Planner planner = new Planner(domain, problems);
+            // ArrayList<String> alignments = planner.readProblems();
+            // log.repairTraces(alignments, model.getActivities());
+
+            
             // ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
             // ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();
             // IOManager.getInstance().exportLog(log);
