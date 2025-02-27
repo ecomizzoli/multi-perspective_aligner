@@ -1,0 +1,70 @@
+activity a1
+bind a1: integer, categorical
+activity a2
+bind a2: integer, categorical
+activity a3
+bind a3: integer, categorical
+activity a4
+bind a4: integer, categorical
+activity a5
+bind a5: integer, categorical
+activity a6
+bind a6: integer, categorical
+activity a7
+bind a7: integer, categorical
+activity a8
+bind a8: integer, categorical
+activity a9
+bind a9: integer, categorical
+activity a10
+bind a10: integer, categorical
+activity a11
+bind a11: integer, categorical
+activity a12
+bind a12: integer, categorical
+activity a13
+bind a13: integer, categorical
+activity a14
+bind a14: integer, categorical
+activity a15
+bind a15: integer, categorical
+activity a16
+bind a16: integer, categorical
+activity a17
+bind a17: integer, categorical
+activity a18
+bind a18: integer, categorical
+activity a19
+bind a19: integer, categorical
+activity a20
+bind a20: integer, categorical
+activity a21
+bind a21: integer, categorical
+activity a22
+bind a22: integer, categorical
+activity a23
+bind a23: integer, categorical
+activity a24
+bind a24: integer, categorical
+activity a25
+bind a25: integer, categorical
+activity a26
+bind a26: integer, categorical
+activity a27
+bind a27: integer, categorical
+activity a28
+bind a28: integer, categorical
+activity a29
+bind a29: integer, categorical
+activity a30
+bind a30: integer, categorical
+integer: integer between 0 and 100
+categorical: c1, c2, c3
+Response[a1, a2] |A.integer > 10 |T.integer < 10 |
+Response[a3, a4] |A.categorical is c1 |T.categorical is c2 |
+Response[a5, a7] |A.categorical is c3 |T.integer > 10 |
+Chain Response[a6, a7] |A.integer > 10 |T.integer > 10 |
+Existence[a10] |A.categorical is c3 |
+Response[a9, a10] |A.integer > 10 |T.integer > 10 |
+Exclusive Choice[a8, a5] |A.categorical is c1 |T.categorical is c3 |
+Existence[a7] |A.integer > 10 |
