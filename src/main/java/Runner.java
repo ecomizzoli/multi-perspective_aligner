@@ -61,10 +61,12 @@ public class Runner {
             // System.out.println("Problems " + problems);
             IOManager.getInstance().exportDomainPDDL(domain);
 
-            // Planner planner = new Planner(domain, problems);
-            // ArrayList<String> alignments = planner.readProblems();
-            // log.repairTraces(alignments, model.getActivities());
+            Planner planner = new Planner(domain, problems);
+            ArrayList<String> alignments = planner.readProblems();
+            log.repairTraces(alignments, model.getActivities());
 
+            int states = planner.getTotalExploredStates();
+            System.out.println("Total explored states: " + states + "; Average: " + states / 200.0);
             
             // ArrayList<XTrace> originalXTraces = log.buildOriginalXTraces();
             // ArrayList<XTrace> repairedXTraces = log.buildRepairedXTraces();

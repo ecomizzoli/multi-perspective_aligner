@@ -22,6 +22,7 @@ public class Planner extends AbstractStateSpacePlanner {
 
     private final String domain;
     private final ArrayList<String> problems;
+    private int exploredStates = 0;
 
     public Planner(String domain, ArrayList<String> problems) {
         super();
@@ -59,7 +60,14 @@ public class Planner extends AbstractStateSpacePlanner {
 
     @Override
     public Plan search(CodedProblem encodedProblem) {
-        StateSpaceStrategy ehc = new AStar(Integer.MAX_VALUE, Heuristic.Type.MAX, 0);
-        return ehc.searchPlan(encodedProblem);
+      StateSpaceStrategy ehc = new AStarAnytime(Integer.MAX_VALUE, Heuristic.Type.MAX, 1);
+      Plan plan = ehc.searchPlan(encodedProblem);
+      System.out.println("Created: " + ehc.getCreatedNodes() + "; Explored: " + ehc.getExploredNodes() + "; Pending: " + ehc.getPendingNodes());
+      this.exploredStates += ehc.getExploredNodes();
+      return plan;
+    }
+
+    public int getTotalExploredStates() {
+      return this.exploredStates;
     }
 }
